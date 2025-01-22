@@ -30,7 +30,7 @@ limitations under the License.
 
     <modules>
         <module>flink-cdc-source-connectors</module>
-        <module>flink-cdc-pipeline-connectors</module>
+<!--        <module>flink-cdc-pipeline-connectors</module>-->
     </modules>
 
 </project>

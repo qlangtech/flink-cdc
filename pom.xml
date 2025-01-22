@@ -33,14 +33,14 @@ limitations under the License.
     <packaging>pom</packaging>
 
     <modules>
-        <module>flink-cdc-cli</module>
-        <module>flink-cdc-common</module>
-        <module>flink-cdc-composer</module>
-        <module>flink-cdc-dist</module>
+<!--        <module>flink-cdc-cli</module>-->
+<!--        <module>flink-cdc-common</module>-->
+<!--        <module>flink-cdc-composer</module>-->
+<!--        <module>flink-cdc-dist</module>-->
         <module>flink-cdc-connect</module>
-        <module>flink-cdc-runtime</module>
-        <module>flink-cdc-e2e-tests</module>
-        <module>tools/ci/flink-cdc-ci-tools</module>
+<!--        <module>flink-cdc-runtime</module>-->
+<!--        <module>flink-cdc-e2e-tests</module>-->
+<!--        <module>tools/ci/flink-cdc-ci-tools</module>-->
     </modules>
 
     <licenses>
