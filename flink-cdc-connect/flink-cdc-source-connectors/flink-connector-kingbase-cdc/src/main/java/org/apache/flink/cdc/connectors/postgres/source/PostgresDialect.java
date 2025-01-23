@@ -88,7 +88,8 @@ public class PostgresDialect implements JdbcDataSourceDialect {
                         dbzConfig.getJdbcConfig(),
                         valueConverterBuilder,
                         CONNECTION_NAME,
-                        new JdbcConnectionFactory(sourceConfig, getPooledDataSourceFactory()));
+                        ()-> PostgresDialect.this.getClass().getClassLoader()
+                        ,new JdbcConnectionFactory(sourceConfig, getPooledDataSourceFactory()));
 
         try {
             jdbc.connect();

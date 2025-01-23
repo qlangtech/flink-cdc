@@ -451,23 +451,23 @@ public class PostgresReplicationConnection extends JdbcConnection implements Rep
         initPublication();
 
         try (Statement stmt = pgConnection().createStatement()) {
-//            String createCommand =
-//                    String.format(
-//                            "CREATE_REPLICATION_SLOT \"%s\" %s LOGICAL %s",
-//                            slotName, tempPart, plugin.getPostgresPluginName());
+            String createCommand =
+                    String.format(
+                            "CREATE_REPLICATION_SLOT \"%s\" %s LOGICAL %s",
+                            slotName, tempPart, plugin.getPostgresPluginName());
 
-            String createCommand = String.format(
-                    "SELECT * FROM pg_create_logical_replication_slot('%s', '%s')",
-                    slotName,
-                    // tempPart,
-                    plugin.getPostgresPluginName());
+//            String createCommand = String.format(
+//                    "SELECT * FROM pg_create_logical_replication_slot('%s', '%s')",
+//                    slotName,
+//                    // tempPart,
+//                    plugin.getPostgresPluginName());
 
             LOGGER.info("Creating replication slot with command {}", createCommand);
             stmt.execute(createCommand);
             // when we are in Postgres 9.4+, we can parse the slot creation info,
             // otherwise, it returns nothing
             if (canExportSnapshot) {
-                this.slotCreationInfo = parseSlotCreation(stmt.getResultSet(), plugin.getPostgresPluginName());
+                this.slotCreationInfo = parseSlotCreation(stmt.getResultSet());
             }
 
             return Optional.ofNullable(slotCreationInfo);
@@ -478,16 +478,16 @@ public class PostgresReplicationConnection extends JdbcConnection implements Rep
         return (BaseConnection) connection(false);
     }
 
-    private SlotCreationResult parseSlotCreation(ResultSet rs, String pluginName) {
+    private SlotCreationResult parseSlotCreation(ResultSet rs) {
         try {
             if (rs.next()) {
                 String slotName = rs.getString("slot_name");
-               // String startPoint = rs.getString("consistent_point");
-                String startPoint = rs.getString("lsn");
-               // String snapName = rs.getString("snapshot_name");
-              //  String pluginName = rs.getString("output_plugin");
+                String startPoint = rs.getString("consistent_point");
+               // String startPoint = rs.getString("lsn");
+                String snapName = rs.getString("snapshot_name");
+                String pluginName = rs.getString("output_plugin");
 
-                return new SlotCreationResult(slotName, startPoint, null, pluginName);
+                return new SlotCreationResult(slotName, startPoint, snapName, pluginName);
             } else {
                 throw new ConnectException("No replication slot found");
             }
