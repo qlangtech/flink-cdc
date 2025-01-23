@@ -426,6 +426,11 @@ public class PostgresReplicationConnection extends JdbcConnection implements Rep
         }
     }
 
+    /**
+     * baisui note
+     * @return
+     * @throws SQLException
+     */
     @Override
     public Optional<SlotCreationResult> createReplicationSlot() throws SQLException {
         // note that some of these options are only supported in Postgres 9.4+, additionally
