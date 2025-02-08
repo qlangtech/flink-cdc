@@ -47,7 +47,7 @@ public class PostgresObjectUtils {
             PostgresConnectorConfig config,
             TypeRegistry typeRegistry,
             TopicSelector<TableId> topicSelector,
-            PostgresValueConverter valueConverter)
+            KingBaseValueConverter valueConverter)
             throws SQLException {
         PostgresSchema schema =
                 new PostgresSchema(
@@ -81,7 +81,7 @@ public class PostgresObjectUtils {
     public static PostgresConnection.PostgresValueConverterBuilder newPostgresValueConverterBuilder(
             PostgresConnectorConfig config) {
         return typeRegistry ->
-                PostgresValueConverter.of(config, StandardCharsets.UTF_8, typeRegistry);
+                KingBaseValueConverter.of(config, StandardCharsets.UTF_8, typeRegistry);
     }
 
     // modified from

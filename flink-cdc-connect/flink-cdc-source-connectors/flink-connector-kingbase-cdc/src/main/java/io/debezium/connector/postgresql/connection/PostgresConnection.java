@@ -10,11 +10,11 @@ import com.zaxxer.hikari.pool.HikariProxyConnection;
 import io.debezium.DebeziumException;
 import io.debezium.annotation.VisibleForTesting;
 import io.debezium.config.Configuration;
+import io.debezium.connector.postgresql.KingBaseValueConverter;
 import io.debezium.connector.postgresql.PgOid;
 import io.debezium.connector.postgresql.PostgresConnectorConfig;
 import io.debezium.connector.postgresql.PostgresSchema;
 import io.debezium.connector.postgresql.PostgresType;
-import io.debezium.connector.postgresql.PostgresValueConverter;
 import io.debezium.connector.postgresql.TypeRegistry;
 import io.debezium.connector.postgresql.spi.SlotState;
 import io.debezium.data.SpecialValueDecimal;
@@ -117,11 +117,11 @@ public class PostgresConnection extends JdbcConnection {
     /**
      * Creates a Postgres connection using the supplied configuration. If necessary this connection
      * is able to resolve data type mappings. Such a connection requires a {@link
-     * PostgresValueConverter}, and will provide its own {@link TypeRegistry}. Usually only one such
+     * KingBaseValueConverter}, and will provide its own {@link TypeRegistry}. Usually only one such
      * connection per connector is needed.
      *
      * @param config                {@link Configuration} instance, may not be null.
-     * @param valueConverterBuilder supplies a configured {@link PostgresValueConverter} for a given
+     * @param valueConverterBuilder supplies a configured {@link KingBaseValueConverter} for a given
      *                              {@link TypeRegistry}
      * @param connectionUsage       a symbolic name of the connection to be tracked in monitoring tools
      */
@@ -135,11 +135,11 @@ public class PostgresConnection extends JdbcConnection {
     /**
      * Creates a Postgres connection using the supplied configuration. If necessary this connection
      * is able to resolve data type mappings. Such a connection requires a {@link
-     * PostgresValueConverter}, and will provide its own {@link TypeRegistry}. Usually only one such
+     * KingBaseValueConverter}, and will provide its own {@link TypeRegistry}. Usually only one such
      * connection per connector is needed.
      *
      * @param config                {@link Configuration} instance, may not be null.
-     * @param valueConverterBuilder supplies a configured {@link PostgresValueConverter} for a given
+     * @param valueConverterBuilder supplies a configured {@link KingBaseValueConverter} for a given
      *                              {@link TypeRegistry}
      * @param connectionUsage       a symbolic name of the connection to be tracked in monitoring tools
      */
@@ -163,7 +163,7 @@ public class PostgresConnection extends JdbcConnection {
         } else {
             this.typeRegistry = new TypeRegistry(this);
 
-            final PostgresValueConverter valueConverter =
+            final KingBaseValueConverter valueConverter =
                     valueConverterBuilder.build(this.typeRegistry);
             this.defaultValueConverter =
                     new PostgresDefaultValueConverter(valueConverter, this.getTimestampUtils());
@@ -191,8 +191,8 @@ public class PostgresConnection extends JdbcConnection {
             this.defaultValueConverter = null;
         } else {
             this.typeRegistry = typeRegistry;
-            final PostgresValueConverter valueConverter =
-                    PostgresValueConverter.of(config, this.getDatabaseCharset(), typeRegistry);
+            final KingBaseValueConverter valueConverter =
+                    KingBaseValueConverter.of(config, this.getDatabaseCharset(), typeRegistry);
             this.defaultValueConverter =
                     new PostgresDefaultValueConverter(valueConverter, this.getTimestampUtils());
         }
@@ -807,7 +807,7 @@ public class PostgresConnection extends JdbcConnection {
                         return s;
                     }
 
-                    Optional<SpecialValueDecimal> value = PostgresValueConverter.toSpecialValue(s);
+                    Optional<SpecialValueDecimal> value = KingBaseValueConverter.toSpecialValue(s);
                     return value.isPresent()
                             ? value.get()
                             : new SpecialValueDecimal(rs.getBigDecimal(columnIndex));
@@ -867,6 +867,6 @@ public class PostgresConnection extends JdbcConnection {
 
     @FunctionalInterface
     public interface PostgresValueConverterBuilder {
-        PostgresValueConverter build(TypeRegistry registry);
+        KingBaseValueConverter build(TypeRegistry registry);
     }
 }
