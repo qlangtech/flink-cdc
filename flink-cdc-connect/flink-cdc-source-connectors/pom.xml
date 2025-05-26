@@ -29,6 +29,8 @@ limitations under the License.
     <packaging>pom</packaging>
 
     <modules>
+        <module>flink-connector-kingbase-cdc</module>
+
         <module>flink-cdc-base</module>
         <module>flink-connector-db2-cdc</module>
         <module>flink-connector-debezium</module>
