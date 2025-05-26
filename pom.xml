@@ -98,7 +98,21 @@ limitations under the License.
         <iceberg.version>1.6.1</iceberg.version>
         <hive.version>2.3.9</hive.version>
         <hadoop.version>3.3.4</hadoop.version>
+        <oss-storage-wagon.version>4.2.0</oss-storage-wagon.version>
     </properties>
+
+    <distributionManagement>
+        <repository>
+            <id>releases</id>
+            <url>oss://maven.qlangtech.com/release</url>
+        </repository>
+        <snapshotRepository>
+            <id>snapshots</id>
+            <url>oss://maven.qlangtech.com/snapshot</url>
+            <uniqueVersion>true</uniqueVersion>
+        </snapshotRepository>
+    </distributionManagement>
+
 
     <dependencyManagement>
         <dependencies>
@@ -356,6 +370,14 @@ limitations under the License.
     </dependencies>
 
     <build>
+        <extensions>
+            <extension>
+                <groupId>com.qlangtech.maven.cloud</groupId>
+                <artifactId>oss-storage-wagon</artifactId>
+                <version>${oss-storage-wagon.version}</version>
+            </extension>
+        </extensions>
+
         <plugins>
             <plugin>
                 <!-- Inherited from Apache parent, but not actually used. Disable to reduce noise. -->
