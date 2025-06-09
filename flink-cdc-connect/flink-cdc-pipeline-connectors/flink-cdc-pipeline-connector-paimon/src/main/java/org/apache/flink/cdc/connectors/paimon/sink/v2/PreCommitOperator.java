@@ -29,6 +29,7 @@ import org.apache.paimon.flink.FlinkCatalogFactory;
 import org.apache.paimon.flink.sink.Committer;
 import org.apache.paimon.flink.sink.MultiTableCommittable;
 import org.apache.paimon.flink.sink.StoreMultiCommitter;
+import org.apache.paimon.flink.utils.RuntimeContextUtils;
 import org.apache.paimon.manifest.WrappedManifestCommittable;
 import org.apache.paimon.options.Options;
 import org.slf4j.Logger;
@@ -38,12 +39,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/** An Operator to add checkpointId to MultiTableCommittable and generate CommittableSummary. */
+/**
+ * An Operator to add checkpointId to MultiTableCommittable and generate CommittableSummary.
+ */
 public class PreCommitOperator
         extends AbstractStreamOperator<CommittableMessage<MultiTableCommittable>>
         implements OneInputStreamOperator<
-                CommittableMessage<MultiTableCommittable>,
-                CommittableMessage<MultiTableCommittable>> {
+        CommittableMessage<MultiTableCommittable>,
+        CommittableMessage<MultiTableCommittable>> {
     protected static final Logger LOGGER = LoggerFactory.getLogger(PreCommitOperator.class);
 
     private final String commitUser;
@@ -54,13 +57,17 @@ public class PreCommitOperator
 
     private StoreMultiCommitter storeMultiCommitter;
 
-    /** store a list of MultiTableCommittable in one checkpoint. */
+    /**
+     * store a list of MultiTableCommittable in one checkpoint.
+     */
     private final List<MultiTableCommittable> multiTableCommittables;
 
     public PreCommitOperator(Options catalogOptions, String commitUser) {
         multiTableCommittables = new ArrayList<>();
         this.catalogOptions = catalogOptions;
         this.commitUser = commitUser;
+
+
     }
 
     @Override
@@ -72,11 +79,15 @@ public class PreCommitOperator
     public void processElement(StreamRecord<CommittableMessage<MultiTableCommittable>> element) {
         if (catalog == null) {
             this.catalog = FlinkCatalogFactory.createPaimonCatalog(catalogOptions);
+            // baisui add for paimon 1.1.1
+            int parallelism = RuntimeContextUtils.getNumberOfParallelSubtasks(getRuntimeContext());
+            int index = RuntimeContextUtils.getIndexOfThisSubtask(getRuntimeContext());
             this.storeMultiCommitter =
                     new StoreMultiCommitter(
                             () -> FlinkCatalogFactory.createPaimonCatalog(catalogOptions),
+                            // final String commitUser, @Nullable final OperatorMetricGroup metricGroup, final boolean streamingCheckpointEnabled, final boolean isRestored, final OperatorStateStore stateStore, final int parallelism, final int subtaskIndex
                             Committer.createContext(
-                                    commitUser, getMetricGroup(), true, false, null));
+                                    commitUser, getMetricGroup(), true, false, null, parallelism, index));
         }
         if (element.getValue() instanceof CommittableWithLineage) {
             multiTableCommittables.add(

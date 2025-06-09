@@ -49,7 +49,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-/** Composer for translating data pipeline to a Flink DataStream job. */
+/**
+ * Composer for translating data pipeline to a Flink DataStream job.
+ */
 @Internal
 public class FlinkPipelineComposer implements PipelineComposer {
 
@@ -108,6 +110,21 @@ public class FlinkPipelineComposer implements PipelineComposer {
 
     private void translate(StreamExecutionEnvironment env, PipelineDef pipelineDef) {
         Configuration pipelineDefConfig = pipelineDef.getConfig();
+        DataSourceTranslator sourceTranslator = new DataSourceTranslator();
+        DataSource dataSource =
+                sourceTranslator.createDataSource(pipelineDef.getSource(), pipelineDefConfig, env);
+        int parallelism = pipelineDefConfig.get(PipelineOptions.PIPELINE_PARALLELISM);
+        DataStream<Event> stream =
+                sourceTranslator.translate(pipelineDef.getSource(), dataSource, env, parallelism);
+        DataSinkTranslator sinkTranslator = new DataSinkTranslator();
+        DataSink dataSink =
+                sinkTranslator.createDataSink(pipelineDef.getSink(), pipelineDefConfig, env);
+        translate(env, dataSource, dataSink, sinkTranslator, stream, pipelineDef);
+    }
+
+    public void translate(StreamExecutionEnvironment env, DataSource dataSource
+            , DataSink dataSink, DataSinkTranslator sinkTranslator, DataStream<Event> stream, PipelineDef pipelineDef) {
+        Configuration pipelineDefConfig = pipelineDef.getConfig();
         int parallelism = pipelineDefConfig.get(PipelineOptions.PIPELINE_PARALLELISM);
         SchemaChangeBehavior schemaChangeBehavior =
                 pipelineDefConfig.get(PipelineOptions.PIPELINE_SCHEMA_CHANGE_BEHAVIOR);
@@ -122,7 +139,7 @@ public class FlinkPipelineComposer implements PipelineComposer {
         }
 
         // Initialize translators
-        DataSourceTranslator sourceTranslator = new DataSourceTranslator();
+        //DataSourceTranslator sourceTranslator = new DataSourceTranslator();
         TransformTranslator transformTranslator = new TransformTranslator();
         PartitioningTranslator partitioningTranslator = new PartitioningTranslator();
         SchemaOperatorTranslator schemaOperatorTranslator =
@@ -131,21 +148,21 @@ public class FlinkPipelineComposer implements PipelineComposer {
                         pipelineDefConfig.get(PipelineOptions.PIPELINE_SCHEMA_OPERATOR_UID),
                         pipelineDefConfig.get(PipelineOptions.PIPELINE_SCHEMA_OPERATOR_RPC_TIMEOUT),
                         pipelineDefConfig.get(PipelineOptions.PIPELINE_LOCAL_TIME_ZONE));
-        DataSinkTranslator sinkTranslator = new DataSinkTranslator();
+
 
         // And required constructors
         OperatorIDGenerator schemaOperatorIDGenerator =
                 new OperatorIDGenerator(schemaOperatorTranslator.getSchemaOperatorUid());
-        DataSource dataSource =
-                sourceTranslator.createDataSource(pipelineDef.getSource(), pipelineDefConfig, env);
-        DataSink dataSink =
-                sinkTranslator.createDataSink(pipelineDef.getSink(), pipelineDefConfig, env);
+//        DataSource dataSource =
+//                sourceTranslator.createDataSource(pipelineDef.getSource(), pipelineDefConfig, env);
+//        DataSink dataSink =
+//                sinkTranslator.createDataSink(pipelineDef.getSink(), pipelineDefConfig, env);
 
         boolean isParallelMetadataSource = dataSource.isParallelMetadataSource();
 
         // O ---> Source
-        DataStream<Event> stream =
-                sourceTranslator.translate(pipelineDef.getSource(), dataSource, env, parallelism);
+//        DataStream<Event> stream =
+//                sourceTranslator.translate(pipelineDef.getSource(), dataSource, env, parallelism);
 
         // Source ---> PreTransform
         stream =

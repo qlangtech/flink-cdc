@@ -22,6 +22,7 @@ import org.apache.flink.api.connector.sink2.Committer;
 import org.apache.paimon.flink.FlinkCatalogFactory;
 import org.apache.paimon.flink.sink.MultiTableCommittable;
 import org.apache.paimon.flink.sink.StoreMultiCommitter;
+import org.apache.paimon.flink.utils.RuntimeContextUtils;
 import org.apache.paimon.manifest.WrappedManifestCommittable;
 import org.apache.paimon.options.Options;
 import org.slf4j.Logger;
@@ -31,6 +32,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /** A {@link Committer} to commit write results for multiple tables. */
@@ -41,12 +43,14 @@ public class PaimonCommitter implements Committer<MultiTableCommittable> {
     private final StoreMultiCommitter storeMultiCommitter;
 
     public PaimonCommitter(Options catalogOptions, String commitUser) {
+
         // flinkMetricGroup could be passed after FLIP-371.
         storeMultiCommitter =
                 new StoreMultiCommitter(
                         () -> FlinkCatalogFactory.createPaimonCatalog(catalogOptions),
                         org.apache.paimon.flink.sink.Committer.createContext(
-                                commitUser, null, true, false, null));
+                                commitUser, null, true, false, null
+                                ,/** for paimon 1.1.1 consist integer baisui*/1,1));
     }
 
     @Override

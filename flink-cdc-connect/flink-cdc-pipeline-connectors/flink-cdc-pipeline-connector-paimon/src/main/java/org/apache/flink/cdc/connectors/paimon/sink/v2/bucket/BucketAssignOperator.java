@@ -46,12 +46,14 @@ import org.apache.paimon.data.GenericRow;
 import org.apache.paimon.flink.FlinkCatalogFactory;
 import org.apache.paimon.index.BucketAssigner;
 import org.apache.paimon.index.HashBucketAssigner;
+import org.apache.paimon.index.IndexFileHandler;
 import org.apache.paimon.options.Options;
 import org.apache.paimon.table.BucketMode;
 import org.apache.paimon.table.FileStoreTable;
 import org.apache.paimon.table.sink.RowKeyExtractor;
 import org.apache.paimon.table.sink.RowPartitionKeyExtractor;
 import org.apache.paimon.utils.MathUtils;
+import org.apache.paimon.utils.SnapshotManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,7 +62,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-/** Assign bucket for every given {@link DataChangeEvent}. */
+/**
+ * Assign bucket for every given {@link DataChangeEvent}.
+ */
 public class BucketAssignOperator extends AbstractStreamOperator<Event>
         implements OneInputStreamOperator<Event, Event> {
 
@@ -160,30 +164,26 @@ public class BucketAssignOperator extends AbstractStreamOperator<Event>
                             dataChangeEvent,
                             schemaMaps.get(dataChangeEvent.tableId()).getFieldGetters());
             switch (tuple4.f0) {
-                case HASH_DYNAMIC:
-                    {
-                        bucket =
-                                tuple4.f2.assign(
-                                        tuple4.f3.partition(genericRow),
-                                        tuple4.f3.trimmedPrimaryKey(genericRow).hashCode());
-                        break;
-                    }
-                case HASH_FIXED:
-                    {
-                        tuple4.f1.setRecord(genericRow);
-                        bucket = tuple4.f1.bucket();
-                        break;
-                    }
-                case BUCKET_UNAWARE:
-                    {
-                        bucket = 0;
-                        break;
-                    }
+                case HASH_DYNAMIC: {
+                    bucket =
+                            tuple4.f2.assign(
+                                    tuple4.f3.partition(genericRow),
+                                    tuple4.f3.trimmedPrimaryKey(genericRow).hashCode());
+                    break;
+                }
+                case HASH_FIXED: {
+                    tuple4.f1.setRecord(genericRow);
+                    bucket = tuple4.f1.bucket();
+                    break;
+                }
+                case BUCKET_UNAWARE: {
+                    bucket = 0;
+                    break;
+                }
                 case CROSS_PARTITION:
-                default:
-                    {
-                        throw new RuntimeException("Unsupported bucket mode: " + tuple4.f0);
-                    }
+                default: {
+                    throw new RuntimeException("Unsupported bucket mode: " + tuple4.f0);
+                }
             }
             output.collect(
                     new StreamRecord<>(new BucketWrapperChangeEvent(bucket, (ChangeEvent) event)));
@@ -206,7 +206,7 @@ public class BucketAssignOperator extends AbstractStreamOperator<Event>
     }
 
     private Tuple4<BucketMode, RowKeyExtractor, BucketAssigner, RowPartitionKeyExtractor>
-            getTableInfo(TableId tableId) {
+    getTableInfo(TableId tableId) {
         Preconditions.checkNotNull(tableId, "Invalid tableId in given event.");
         FileStoreTable table;
         try {
@@ -216,9 +216,13 @@ public class BucketAssignOperator extends AbstractStreamOperator<Event>
         }
         long targetRowNum = table.coreOptions().dynamicBucketTargetRowNum();
         Integer numAssigners = table.coreOptions().dynamicBucketInitialBuckets();
+
+        int maxBucketsNum = table.coreOptions().dynamicBucketMaxBuckets();
+
         return new Tuple4<>(
                 table.bucketMode(),
                 table.createRowKeyExtractor(),
+                // SnapshotManager snapshotManager, String commitUser, IndexFileHandler indexFileHandler, int numChannels, int numAssigners, int assignId, long targetBucketRowNumber, int maxBucketsNum
                 new HashBucketAssigner(
                         table.snapshotManager(),
                         commitUser,
@@ -226,7 +230,7 @@ public class BucketAssignOperator extends AbstractStreamOperator<Event>
                         totalTasksNumber,
                         MathUtils.min(numAssigners, totalTasksNumber),
                         currentTaskNumber,
-                        targetRowNum),
+                        targetRowNum, maxBucketsNum),
                 new RowPartitionKeyExtractor(table.schema()));
     }
 }

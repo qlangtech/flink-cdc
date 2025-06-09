@@ -30,6 +30,7 @@ import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.paimon.flink.sink.FlinkStreamPartitioner;
 import org.apache.paimon.flink.sink.MultiTableCommittable;
 import org.apache.paimon.flink.sink.MultiTableCommittableSerializer;
+import org.apache.paimon.flink.utils.RuntimeContextUtils;
 import org.apache.paimon.options.Options;
 import org.apache.paimon.table.sink.CommitMessageSerializer;
 
@@ -71,6 +72,7 @@ public class PaimonSink<InputT> implements WithPreCommitTopology<InputT, MultiTa
 
     @Override
     public Committer<MultiTableCommittable> createCommitter() {
+
         return new PaimonCommitter(catalogOptions, commitUser);
     }
 
