@@ -285,11 +285,22 @@ at com.qlangtech.tis.plugins.incr.flink.connector.PipelineEventSinkFunc.createTa
 -->
                                 <filter>
                                     <artifact>*:*</artifact>
-                                    <excludes>
-                                        <!--because need to reserve org/apache/paimon/flink/**-->
-                                        <exclude>org/apache/paimon/schema/**</exclude>
-                                        <exclude>org/apache/paimon/options/**</exclude>
-                                    </excludes>
+                                    <!--because need to reserve org/apache/paimon/flink/**-->
+<!--                                    <excludes>-->
+<!--                                        <exclude>org/apache/paimon/schema/**</exclude>-->
+<!--                                        <exclude>org/apache/paimon/options/**</exclude>-->
+<!--                                        <exclude>org/apache/paimon/factories/**</exclude>-->
+<!--                                        <exclude>org/apache/paimon/catalog/**</exclude>-->
+<!--                                        <exclude>org/apache/paimon/data/**</exclude>-->
+<!--                                        <exclude>org/apache/paimon/table/**</exclude>-->
+<!--                                        <exclude>org/apache/paimon/hive/**</exclude>-->
+<!--                                        <exclude>org/apache/paimon/types/**</exclude>-->
+<!--                                        <exclude>org/apache/paimon/fs/**</exclude>-->
+<!--                                    </excludes>-->
+                                    <includes>
+                                        <include>org/apache/paimon/flink/**</include>
+                                        <include>org/apache/flink/cdc/**</include>
+                                    </includes>
                                 </filter>
                             </filters>
                             <relocations>
