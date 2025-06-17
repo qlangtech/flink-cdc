@@ -92,6 +92,7 @@ public class PostgresTypeUtils {
                 return DataTypes.ARRAY(DataTypes.BYTES());
             case PG_SMALLINT:
             case PG_SMALLSERIAL:
+            case "int":
                 return DataTypes.SMALLINT();
             case PG_SMALLINT_ARRAY:
                 return DataTypes.ARRAY(DataTypes.SMALLINT());
@@ -100,6 +101,7 @@ public class PostgresTypeUtils {
                 return DataTypes.INT();
             case PG_INTEGER_ARRAY:
                 return DataTypes.ARRAY(DataTypes.INT());
+            case "bigint":
             case PG_BIGINT:
             case PG_BIGSERIAL:
                 return DataTypes.BIGINT();
