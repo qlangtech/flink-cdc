@@ -37,6 +37,7 @@ public class PostgresSourceConfig extends JdbcSourceConfig {
     private static final long serialVersionUID = 1L;
 
     private final int subtaskId;
+    private final int lsnCommitCheckpointsDelay;
 
     public PostgresSourceConfig(
             int subtaskId,
@@ -64,7 +65,9 @@ public class PostgresSourceConfig extends JdbcSourceConfig {
             int connectionPoolSize,
             @Nullable String chunkKeyColumn,
             boolean skipSnapshotBackfill,
-            boolean isScanNewlyAddedTableEnabled) {
+            boolean isScanNewlyAddedTableEnabled,
+            int lsnCommitCheckpointsDelay,
+            boolean assignUnboundedChunkFirst) {
         super(
                 startupOptions,
                 databaseList,
@@ -90,16 +93,37 @@ public class PostgresSourceConfig extends JdbcSourceConfig {
                 connectionPoolSize,
                 chunkKeyColumn,
                 skipSnapshotBackfill,
-                isScanNewlyAddedTableEnabled);
+                isScanNewlyAddedTableEnabled,
+                assignUnboundedChunkFirst);
         this.subtaskId = subtaskId;
+        this.lsnCommitCheckpointsDelay = lsnCommitCheckpointsDelay;
     }
 
+    /**
+     * Returns {@code subtaskId} value.
+     *
+     * @return subtask id
+     */
     public int getSubtaskId() {
         return subtaskId;
     }
 
+    /**
+     * Returns {@code lsnCommitCheckpointsDelay} value.
+     *
+     * @return lsn commit checkpoint delay
+     */
+    public int getLsnCommitCheckpointsDelay() {
+        return this.lsnCommitCheckpointsDelay;
+    }
+
+    /**
+     * Returns the slot name for backfill task.
+     *
+     * @return backfill task slot name
+     */
     public String getSlotNameForBackfillTask() {
-        return getDbzProperties().getProperty(SLOT_NAME.name()) + "_" + subtaskId;
+        return getDbzProperties().getProperty(SLOT_NAME.name()) + "_" + getSubtaskId();
     }
 
     @Override
