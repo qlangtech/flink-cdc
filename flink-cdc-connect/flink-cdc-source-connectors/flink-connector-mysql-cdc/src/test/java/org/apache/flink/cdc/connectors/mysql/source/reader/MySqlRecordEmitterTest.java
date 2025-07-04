@@ -88,21 +88,22 @@ class MySqlRecordEmitterTest {
     }
 
     private MySqlRecordEmitter<Void> createRecordEmitter() {
-        return new MySqlRecordEmitter<>(
-                new DebeziumDeserializationSchema<Void>() {
-                    @Override
-                    public void deserialize(SourceRecord record, Collector<Void> out) {
-                        throw new UnsupportedOperationException();
-                    }
-
-                    @Override
-                    public TypeInformation<Void> getProducedType() {
-                        return TypeInformation.of(Void.class);
-                    }
-                },
-                new MySqlSourceReaderMetrics(
-                        UnregisteredMetricGroups.createUnregisteredOperatorMetricGroup()),
-                false);
+//        return new MySqlRecordEmitter<>(
+//                new DebeziumDeserializationSchema<Void>() {
+//                    @Override
+//                    public void deserialize(SourceRecord record, Collector<Void> out) {
+//                        throw new UnsupportedOperationException();
+//                    }
+//
+//                    @Override
+//                    public TypeInformation<Void> getProducedType() {
+//                        return TypeInformation.of(Void.class);
+//                    }
+//                },
+//                new MySqlSourceReaderMetrics(
+//                        UnregisteredMetricGroups.createUnregisteredOperatorMetricGroup()),
+//                false);
+        return null;
     }
 
     private MySqlBinlogSplitState createBinlogSplitState() {

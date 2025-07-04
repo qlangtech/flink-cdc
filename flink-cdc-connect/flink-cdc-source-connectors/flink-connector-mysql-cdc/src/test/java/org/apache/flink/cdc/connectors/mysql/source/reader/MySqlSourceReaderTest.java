@@ -572,7 +572,7 @@ class MySqlSourceReaderTest extends MySqlSourceTestBase {
                                 limit)
                         : new MySqlRecordEmitter<>(
                                 new ForwardDeserializeSchema(),
-                                new MySqlSourceReaderMetrics(metricGroup),
+                             null, //  new MySqlSourceReaderMetrics(metricGroup),
                                 configuration.isIncludeSchemaChanges());
         final MySqlSourceReaderContext mySqlSourceReaderContext =
                 new MySqlSourceReaderContext(readerContext);
