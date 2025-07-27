@@ -292,7 +292,8 @@ public class BinlogSplitReader implements DebeziumReader<SourceRecords, MySqlSpl
     private boolean hasEnterPureBinlogPhase(TableId tableId, BinlogOffset position) {
         // the existed tables those have finished snapshot reading
         if (maxSplitHighWatermarkMap.containsKey(tableId)
-                && position.isAfter(maxSplitHighWatermarkMap.get(tableId))) {
+                // 百岁(baisui) 修改2025/07/27 将代码改回去了,不然 stop之后再 恢复之后 就不会消费最新的更新消息了，https://github.com/datavane/tis/issues/463
+                && position.isAtOrAfter(maxSplitHighWatermarkMap.get(tableId))) {
             pureBinlogPhaseTables.add(tableId);
             return true;
         }
