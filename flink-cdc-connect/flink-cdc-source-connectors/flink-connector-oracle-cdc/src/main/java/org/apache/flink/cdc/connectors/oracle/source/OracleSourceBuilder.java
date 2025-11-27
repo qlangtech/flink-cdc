@@ -40,10 +40,14 @@ import static org.apache.flink.util.Preconditions.checkNotNull;
  */
 @Internal
 public class OracleSourceBuilder<T> {
-    private final OracleSourceConfigFactory configFactory = new OracleSourceConfigFactory();
+    private final OracleSourceConfigFactory configFactory;
     private RedoLogOffsetFactory offsetFactory;
     private OracleDialect dialect;
     private DebeziumDeserializationSchema<T> deserializer;
+
+    public OracleSourceBuilder(OracleSourceConfigFactory configFactory) {
+        this.configFactory = configFactory;
+    }
 
     public OracleSourceBuilder<T> hostname(String hostname) {
         this.configFactory.hostname(hostname);
@@ -266,6 +270,7 @@ public class OracleSourceBuilder<T> {
     public OracleIncrementalSource<T> build() {
         this.offsetFactory = new RedoLogOffsetFactory();
         this.dialect = new OracleDialect();
+
         return new OracleIncrementalSource<T>(
                 configFactory, checkNotNull(deserializer), offsetFactory, dialect);
     }
@@ -280,9 +285,11 @@ public class OracleSourceBuilder<T> {
                 OracleDialect dataSourceDialect) {
             super(configFactory, deserializationSchema, offsetFactory, dataSourceDialect);
         }
-
-        public static <T> OracleSourceBuilder<T> builder() {
-            return new OracleSourceBuilder<>();
+        public static <T> OracleSourceBuilder<T> builder(){
+            return builder(new OracleSourceConfigFactory());
+        }
+        public static <T> OracleSourceBuilder<T> builder( OracleSourceConfigFactory configFactory) {
+            return new OracleSourceBuilder<>(configFactory);
         }
     }
 }
