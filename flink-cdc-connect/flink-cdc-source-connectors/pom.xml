@@ -52,6 +52,9 @@ limitations under the License.
         <module>flink-sql-connector-sqlserver-cdc</module>
         <module>flink-sql-connector-tidb-cdc</module>
         <module>flink-sql-connector-vitess-cdc</module>
+
+        <module>flink-connector-dameng-cdc</module>
+
     </modules>
 
     <dependencies>

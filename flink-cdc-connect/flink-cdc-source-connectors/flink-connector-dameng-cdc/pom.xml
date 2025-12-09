@@ -28,8 +28,8 @@ limitations under the License.
     </properties>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>flink-connector-oracle-cdc-tis</artifactId>
-    <name>flink-connector-oracle-cdc</name>
+    <artifactId>flink-connector-dameng-cdc-tis</artifactId>
+    <name>flink-connector-dameng-cdc</name>
     <packaging>jar</packaging>
 
     <dependencies>
@@ -55,7 +55,7 @@ limitations under the License.
 
         <dependency>
             <groupId>io.debezium</groupId>
-            <artifactId>debezium-connector-oracle-tis</artifactId>
+            <artifactId>debezium-connector-dameng</artifactId>
             <version>${debezium.version}</version>
         </dependency>
 

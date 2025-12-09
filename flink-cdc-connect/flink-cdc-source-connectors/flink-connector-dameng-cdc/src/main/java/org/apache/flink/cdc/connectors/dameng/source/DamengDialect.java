@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.flink.cdc.connectors.oracle.source;
+package org.apache.flink.cdc.connectors.dameng.source;
 
 import org.apache.flink.cdc.common.annotation.Experimental;
 import org.apache.flink.cdc.connectors.base.config.JdbcSourceConfig;
@@ -26,49 +26,54 @@ import org.apache.flink.cdc.connectors.base.source.assigner.state.ChunkSplitterS
 import org.apache.flink.cdc.connectors.base.source.meta.offset.Offset;
 import org.apache.flink.cdc.connectors.base.source.meta.split.SourceSplitBase;
 import org.apache.flink.cdc.connectors.base.source.reader.external.FetchTask;
-import org.apache.flink.cdc.connectors.oracle.source.assigner.splitter.OracleChunkSplitter;
-import org.apache.flink.cdc.connectors.oracle.source.config.OracleSourceConfig;
-import org.apache.flink.cdc.connectors.oracle.source.reader.fetch.OracleScanFetchTask;
-import org.apache.flink.cdc.connectors.oracle.source.reader.fetch.OracleSourceFetchTaskContext;
-import org.apache.flink.cdc.connectors.oracle.source.reader.fetch.OracleStreamFetchTask;
-import org.apache.flink.cdc.connectors.oracle.source.utils.OracleConnectionUtils;
-import org.apache.flink.cdc.connectors.oracle.source.utils.OracleSchema;
+import org.apache.flink.cdc.connectors.dameng.source.assigner.splitter.DamengChunkSplitter;
+import org.apache.flink.cdc.connectors.dameng.source.config.DamengSourceConfig;
+import org.apache.flink.cdc.connectors.dameng.source.reader.fetch.DamengScanFetchTask;
+import org.apache.flink.cdc.connectors.dameng.source.reader.fetch.DamengSourceFetchTaskContext;
+import org.apache.flink.cdc.connectors.dameng.source.reader.fetch.DamengStreamFetchTask;
+import org.apache.flink.cdc.connectors.dameng.source.utils.DamengConnectionUtils;
+import org.apache.flink.cdc.connectors.dameng.source.utils.DamengSchema;
 import org.apache.flink.util.FlinkRuntimeException;
 
-import io.debezium.connector.oracle.OracleConnection;
 import io.debezium.jdbc.JdbcConnection;
 import io.debezium.relational.TableId;
 import io.debezium.relational.Tables;
 import io.debezium.relational.history.TableChanges.TableChange;
+import org.devlive.connector.dameng.DamengConnection;
 
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.apache.flink.cdc.connectors.oracle.source.utils.OracleConnectionUtils.createOracleConnection;
-import static org.apache.flink.cdc.connectors.oracle.source.utils.OracleConnectionUtils.currentRedoLogOffset;
+import static org.apache.flink.cdc.connectors.dameng.source.utils.DamengConnectionUtils.createDamengConnection;
+import static org.apache.flink.cdc.connectors.dameng.source.utils.DamengConnectionUtils.currentRedoLogOffset;
 
-/**
- * The {@link JdbcDataSourceDialect} implementation for Oracle datasource.
- */
+/** The {@link JdbcDataSourceDialect} implementation for Dameng datasource. */
 @Experimental
-public class OracleDialect implements JdbcDataSourceDialect {
+public class DamengDialect implements JdbcDataSourceDialect {
 
     private static final long serialVersionUID = 1L;
-    private transient OracleSchema oracleSchema;
-    public static final String SHOW_CURRENT_SCN = "SELECT CURRENT_SCN FROM V$DATABASE";
+    private transient DamengSchema damengSchema;
+    /**
+     * Get current SCN from Dameng database. Dameng database provides
+     * DBMS_FLASHBACK.GET_SYSTEM_CHANGE_NUMBER() function to get current SCN.
+     */
+    public static final String SHOW_CURRENT_SCN =
+            "SELECT DBMS_FLASHBACK.GET_SYSTEM_CHANGE_NUMBER() AS CURRENT_SCN FROM DUAL";
+
     private transient Tables.TableFilter filters;
 
     @Override
     public String getName() {
-        return "Oracle";
+        return "Dameng";
     }
 
     @Override
     public final Offset displayCurrentOffset(JdbcSourceConfig sourceConfig) {
         try (JdbcConnection jdbcConnection = openJdbcConnection(sourceConfig)) {
-            return currentRedoLogOffset(getQueryCurrentRedoLogOffsetSQLShowCurrentScn(), jdbcConnection);
+            return currentRedoLogOffset(
+                    getQueryCurrentRedoLogOffsetSQLShowCurrentScn(), jdbcConnection);
         } catch (Exception e) {
             throw new FlinkRuntimeException("Read the redoLog offset error", e);
         }
@@ -81,38 +86,42 @@ public class OracleDialect implements JdbcDataSourceDialect {
     @Override
     public boolean isDataCollectionIdCaseSensitive(JdbcSourceConfig sourceConfig) {
         try (JdbcConnection jdbcConnection = openJdbcConnection(sourceConfig)) {
-            OracleConnection oracleConnection = (OracleConnection) jdbcConnection;
-            return oracleConnection.getOracleVersion().getMajor() == 11;
+            DamengConnection damengConnection = (DamengConnection) jdbcConnection;
+            return damengConnection.getOracleVersion().getMajor() == 7;
         } catch (SQLException e) {
-            throw new FlinkRuntimeException("Error reading oracle variables: " + e.getMessage(), e);
+            throw new FlinkRuntimeException("Error reading dameng variables: " + e.getMessage(), e);
         }
     }
 
     @Override
     public JdbcConnection openJdbcConnection(JdbcSourceConfig sourceConfig) {
-        return OracleConnectionUtils.createOracleConnection(sourceConfig.getDbzConnectorConfig().getJdbcConfig());
+        return DamengConnectionUtils.createDamengConnection(
+                sourceConfig.getDbzConnectorConfig().getJdbcConfig());
     }
 
     @Override
     public ChunkSplitter createChunkSplitter(JdbcSourceConfig sourceConfig) {
-        return new OracleChunkSplitter(sourceConfig, this, ChunkSplitterState.NO_SPLITTING_TABLE_STATE);
+        return new DamengChunkSplitter(
+                sourceConfig, this, ChunkSplitterState.NO_SPLITTING_TABLE_STATE);
     }
 
     @Override
-    public ChunkSplitter createChunkSplitter(JdbcSourceConfig sourceConfig, ChunkSplitterState chunkSplitterState) {
-        return new OracleChunkSplitter(sourceConfig, this, chunkSplitterState);
+    public ChunkSplitter createChunkSplitter(
+            JdbcSourceConfig sourceConfig, ChunkSplitterState chunkSplitterState) {
+        return new DamengChunkSplitter(sourceConfig, this, chunkSplitterState);
     }
 
     @Override
     public JdbcConnectionPoolFactory getPooledDataSourceFactory() {
-        return new OraclePooledDataSourceFactory();
+        return new DamengPooledDataSourceFactory();
     }
 
     @Override
     public List<TableId> discoverDataCollections(JdbcSourceConfig sourceConfig) {
-        OracleSourceConfig oracleSourceConfig = (OracleSourceConfig) sourceConfig;
+        DamengSourceConfig damengSourceConfig = (DamengSourceConfig) sourceConfig;
         try (JdbcConnection jdbcConnection = openJdbcConnection(sourceConfig)) {
-            return OracleConnectionUtils.listTables(jdbcConnection, oracleSourceConfig.getTableFilters());
+            return DamengConnectionUtils.listTables(
+                    jdbcConnection, damengSourceConfig.getTableFilters());
         } catch (SQLException e) {
             throw new FlinkRuntimeException("Error to discover tables: " + e.getMessage(), e);
         }
@@ -122,7 +131,7 @@ public class OracleDialect implements JdbcDataSourceDialect {
     public Map<TableId, TableChange> discoverDataCollectionSchemas(JdbcSourceConfig sourceConfig) {
         final List<TableId> capturedTableIds = discoverDataCollections(sourceConfig);
 
-        try (OracleConnection jdbc = createOracleConnection(sourceConfig.getDbzConfiguration())) {
+        try (DamengConnection jdbc = createDamengConnection(sourceConfig.getDbzConfiguration())) {
             // fetch table schemas
             Map<TableId, TableChange> tableSchemas = new HashMap<>();
             for (TableId tableId : capturedTableIds) {
@@ -131,29 +140,30 @@ public class OracleDialect implements JdbcDataSourceDialect {
             }
             return tableSchemas;
         } catch (Exception e) {
-            throw new FlinkRuntimeException("Error to discover table schemas: " + e.getMessage(), e);
+            throw new FlinkRuntimeException(
+                    "Error to discover table schemas: " + e.getMessage(), e);
         }
     }
 
     @Override
     public TableChange queryTableSchema(JdbcConnection jdbc, TableId tableId) {
-        if (oracleSchema == null) {
-            oracleSchema = new OracleSchema();
+        if (damengSchema == null) {
+            damengSchema = new DamengSchema();
         }
-        return oracleSchema.getTableSchema(jdbc, tableId);
+        return damengSchema.getTableSchema(jdbc, tableId);
     }
 
     @Override
-    public OracleSourceFetchTaskContext createFetchTaskContext(JdbcSourceConfig taskSourceConfig) {
-        return new OracleSourceFetchTaskContext(taskSourceConfig, this);
+    public DamengSourceFetchTaskContext createFetchTaskContext(JdbcSourceConfig taskSourceConfig) {
+        return new DamengSourceFetchTaskContext(taskSourceConfig, this);
     }
 
     @Override
     public FetchTask<SourceSplitBase> createFetchTask(SourceSplitBase sourceSplitBase) {
         if (sourceSplitBase.isSnapshotSplit()) {
-            return new OracleScanFetchTask(sourceSplitBase.asSnapshotSplit());
+            return new DamengScanFetchTask(sourceSplitBase.asSnapshotSplit());
         } else {
-            return new OracleStreamFetchTask(sourceSplitBase.asStreamSplit());
+            return new DamengStreamFetchTask(sourceSplitBase.asStreamSplit());
         }
     }
 

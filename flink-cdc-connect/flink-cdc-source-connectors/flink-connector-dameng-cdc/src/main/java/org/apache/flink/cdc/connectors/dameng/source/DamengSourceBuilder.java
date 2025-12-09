@@ -15,13 +15,13 @@
  * limitations under the License.
  */
 
-package org.apache.flink.cdc.connectors.oracle.source;
+package org.apache.flink.cdc.connectors.dameng.source;
 
 import org.apache.flink.cdc.common.annotation.Internal;
 import org.apache.flink.cdc.connectors.base.options.StartupOptions;
 import org.apache.flink.cdc.connectors.base.source.jdbc.JdbcIncrementalSource;
-import org.apache.flink.cdc.connectors.oracle.source.config.OracleSourceConfigFactory;
-import org.apache.flink.cdc.connectors.oracle.source.meta.offset.RedoLogOffsetFactory;
+import org.apache.flink.cdc.connectors.dameng.source.config.DamengSourceConfigFactory;
+import org.apache.flink.cdc.connectors.dameng.source.meta.offset.RedoLogOffsetFactory;
 import org.apache.flink.cdc.debezium.DebeziumDeserializationSchema;
 
 import javax.annotation.Nullable;
@@ -33,41 +33,37 @@ import java.util.Properties;
 import static org.apache.flink.util.Preconditions.checkNotNull;
 
 /**
- * The builder class for {@link OracleIncrementalSource} to make it easier for the users to
- * construct a {@link OracleIncrementalSource}.
+ * The builder class for {@link DamengIncrementalSource} to make it easier for the users to
+ * construct a {@link DamengIncrementalSource}.
  *
  * <p>Check the Java docs of each individual method to learn more about the settings to build a
- * {@link OracleIncrementalSource}.
+ * {@link DamengIncrementalSource}.
  */
 @Internal
-public class OracleSourceBuilder<T> {
-    private final OracleSourceConfigFactory configFactory;
+public class DamengSourceBuilder<T> {
+    private final DamengSourceConfigFactory configFactory;
     private RedoLogOffsetFactory offsetFactory;
-    private final OracleDialect dialect;
+    private final DamengDialect dialect;
     private DebeziumDeserializationSchema<T> deserializer;
 
-    public OracleSourceBuilder(OracleSourceConfigFactory configFactory, OracleDialect dialect) {
+    public DamengSourceBuilder(DamengSourceConfigFactory configFactory, DamengDialect dialect) {
         this.configFactory = configFactory;
         this.dialect = dialect;
     }
 
-    public OracleSourceBuilder<T> hostname(String hostname) {
+    public DamengSourceBuilder<T> hostname(String hostname) {
         this.configFactory.hostname(hostname);
         return this;
     }
 
-    /**
-     * Url to use when connecting to the Oracle database server.
-     */
-    public OracleSourceBuilder<T> url(@Nullable String url) {
+    /** Url to use when connecting to the Oracle database server. */
+    public DamengSourceBuilder<T> url(@Nullable String url) {
         this.configFactory.url(url);
         return this;
     }
 
-    /**
-     * Integer port number of the Oracle database server.
-     */
-    public OracleSourceBuilder<T> port(int port) {
+    /** Integer port number of the Oracle database server. */
+    public DamengSourceBuilder<T> port(int port) {
         this.configFactory.port(port);
         return this;
     }
@@ -76,7 +72,7 @@ public class OracleSourceBuilder<T> {
      * An required list of regular expressions that match database names to be monitored; any
      * database name not included in the whitelist will be excluded from monitoring.
      */
-    public OracleSourceBuilder<T> databaseList(String... databaseList) {
+    public DamengSourceBuilder<T> databaseList(String... databaseList) {
         this.configFactory.databaseList(databaseList);
         return this;
     }
@@ -86,7 +82,7 @@ public class OracleSourceBuilder<T> {
      * name not included in the whitelist will be excluded from monitoring. By default all
      * non-system schemas will be monitored.
      */
-    public OracleSourceBuilder<T> schemaList(String... schemaList) {
+    public DamengSourceBuilder<T> schemaList(String... schemaList) {
         this.configFactory.schemaList(schemaList);
         return this;
     }
@@ -96,23 +92,19 @@ public class OracleSourceBuilder<T> {
      * tables to be monitored; any table not included in the list will be excluded from monitoring.
      * Each identifier is of the form {@code <databaseName>.<tableName>}.
      */
-    public OracleSourceBuilder<T> tableList(String... tableList) {
+    public DamengSourceBuilder<T> tableList(String... tableList) {
         this.configFactory.tableList(tableList);
         return this;
     }
 
-    /**
-     * Name of the Oracle database to use when connecting to the Oracle database server.
-     */
-    public OracleSourceBuilder<T> username(String username) {
+    /** Name of the Oracle database to use when connecting to the Oracle database server. */
+    public DamengSourceBuilder<T> username(String username) {
         this.configFactory.username(username);
         return this;
     }
 
-    /**
-     * Password to use when connecting to the Oracle database server.
-     */
-    public OracleSourceBuilder<T> password(String password) {
+    /** Password to use when connecting to the Oracle database server. */
+    public DamengSourceBuilder<T> password(String password) {
         this.configFactory.password(password);
         return this;
     }
@@ -122,7 +114,7 @@ public class OracleSourceBuilder<T> {
      * TIMESTAMP type in Oracle converted to STRING. See more
      * https://debezium.io/documentation/reference/1.9/connectors/oracle.html#oracle-temporal-types
      */
-    public OracleSourceBuilder<T> serverTimeZone(String timeZone) {
+    public DamengSourceBuilder<T> serverTimeZone(String timeZone) {
         this.configFactory.serverTimeZone(timeZone);
         return this;
     }
@@ -131,7 +123,7 @@ public class OracleSourceBuilder<T> {
      * The split size (number of rows) of table snapshot, captured tables are split into multiple
      * splits when read the snapshot of table.
      */
-    public OracleSourceBuilder<T> splitSize(int splitSize) {
+    public DamengSourceBuilder<T> splitSize(int splitSize) {
         this.configFactory.splitSize(splitSize);
         return this;
     }
@@ -140,7 +132,7 @@ public class OracleSourceBuilder<T> {
      * The group size of split meta, if the meta size exceeds the group size, the meta will be will
      * be divided into multiple groups.
      */
-    public OracleSourceBuilder<T> splitMetaGroupSize(int splitMetaGroupSize) {
+    public DamengSourceBuilder<T> splitMetaGroupSize(int splitMetaGroupSize) {
         this.configFactory.splitMetaGroupSize(splitMetaGroupSize);
         return this;
     }
@@ -149,7 +141,7 @@ public class OracleSourceBuilder<T> {
      * The upper bound of split key evenly distribution factor, the factor is used to determine
      * whether the table is evenly distribution or not.
      */
-    public OracleSourceBuilder<T> distributionFactorUpper(double distributionFactorUpper) {
+    public DamengSourceBuilder<T> distributionFactorUpper(double distributionFactorUpper) {
         this.configFactory.distributionFactorUpper(distributionFactorUpper);
         return this;
     }
@@ -158,15 +150,13 @@ public class OracleSourceBuilder<T> {
      * The lower bound of split key evenly distribution factor, the factor is used to determine
      * whether the table is evenly distribution or not.
      */
-    public OracleSourceBuilder<T> distributionFactorLower(double distributionFactorLower) {
+    public DamengSourceBuilder<T> distributionFactorLower(double distributionFactorLower) {
         this.configFactory.distributionFactorLower(distributionFactorLower);
         return this;
     }
 
-    /**
-     * The maximum fetch size for per poll when read table snapshot.
-     */
-    public OracleSourceBuilder<T> fetchSize(int fetchSize) {
+    /** The maximum fetch size for per poll when read table snapshot. */
+    public DamengSourceBuilder<T> fetchSize(int fetchSize) {
         this.configFactory.fetchSize(fetchSize);
         return this;
     }
@@ -175,39 +165,31 @@ public class OracleSourceBuilder<T> {
      * The maximum time that the connector should wait after trying to connect to the Oracle
      * database server before timing out.
      */
-    public OracleSourceBuilder<T> connectTimeout(Duration connectTimeout) {
+    public DamengSourceBuilder<T> connectTimeout(Duration connectTimeout) {
         this.configFactory.connectTimeout(connectTimeout);
         return this;
     }
 
-    /**
-     * The max retry times to get connection.
-     */
-    public OracleSourceBuilder<T> connectMaxRetries(int connectMaxRetries) {
+    /** The max retry times to get connection. */
+    public DamengSourceBuilder<T> connectMaxRetries(int connectMaxRetries) {
         this.configFactory.connectMaxRetries(connectMaxRetries);
         return this;
     }
 
-    /**
-     * The connection pool size.
-     */
-    public OracleSourceBuilder<T> connectionPoolSize(int connectionPoolSize) {
+    /** The connection pool size. */
+    public DamengSourceBuilder<T> connectionPoolSize(int connectionPoolSize) {
         this.configFactory.connectionPoolSize(connectionPoolSize);
         return this;
     }
 
-    /**
-     * Whether the {@link OracleIncrementalSource} should output the schema changes or not.
-     */
-    public OracleSourceBuilder<T> includeSchemaChanges(boolean includeSchemaChanges) {
+    /** Whether the {@link DamengIncrementalSource} should output the schema changes or not. */
+    public DamengSourceBuilder<T> includeSchemaChanges(boolean includeSchemaChanges) {
         this.configFactory.includeSchemaChanges(includeSchemaChanges);
         return this;
     }
 
-    /**
-     * Specifies the startup options.
-     */
-    public OracleSourceBuilder<T> startupOptions(StartupOptions startupOptions) {
+    /** Specifies the startup options. */
+    public DamengSourceBuilder<T> startupOptions(StartupOptions startupOptions) {
         this.configFactory.startupOptions(startupOptions);
         return this;
     }
@@ -216,15 +198,13 @@ public class OracleSourceBuilder<T> {
      * The chunk key of table snapshot, captured tables are split into multiple chunks by the chunk
      * key column when read the snapshot of table.
      */
-    public OracleSourceBuilder<T> chunkKeyColumn(String chunkKeyColumn) {
+    public DamengSourceBuilder<T> chunkKeyColumn(String chunkKeyColumn) {
         this.configFactory.chunkKeyColumn(chunkKeyColumn);
         return this;
     }
 
-    /**
-     * The Debezium Oracle connector properties. For example, "snapshot.mode".
-     */
-    public OracleSourceBuilder<T> debeziumProperties(Properties properties) {
+    /** The Debezium Oracle connector properties. For example, "snapshot.mode". */
+    public DamengSourceBuilder<T> debeziumProperties(Properties properties) {
         this.configFactory.debeziumProperties(properties);
         return this;
     }
@@ -239,7 +219,7 @@ public class OracleSourceBuilder<T> {
      * <p>See more
      * https://cwiki.apache.org/confluence/display/FLINK/FLIP-147%3A+Support+Checkpoints+After+Tasks+Finished.
      */
-    public OracleSourceBuilder<T> closeIdleReaders(boolean closeIdleReaders) {
+    public DamengSourceBuilder<T> closeIdleReaders(boolean closeIdleReaders) {
         this.configFactory.closeIdleReaders(closeIdleReaders);
         return this;
     }
@@ -248,7 +228,7 @@ public class OracleSourceBuilder<T> {
      * The deserializer used to convert from consumed {@link
      * org.apache.kafka.connect.source.SourceRecord}.
      */
-    public OracleSourceBuilder<T> deserializer(DebeziumDeserializationSchema<T> deserializer) {
+    public DamengSourceBuilder<T> deserializer(DebeziumDeserializationSchema<T> deserializer) {
         this.deserializer = deserializer;
         return this;
     }
@@ -264,59 +244,69 @@ public class OracleSourceBuilder<T> {
      * promised). For example updating an already updated value in snapshot, or deleting an already
      * deleted entry in snapshot. These replayed binlog events should be handled specially.
      */
-    public OracleSourceBuilder<T> skipSnapshotBackfill(boolean skipSnapshotBackfill) {
+    public DamengSourceBuilder<T> skipSnapshotBackfill(boolean skipSnapshotBackfill) {
         this.configFactory.skipSnapshotBackfill(skipSnapshotBackfill);
         return this;
     }
 
-    /**
-     * Whether the {@link OracleIncrementalSource} should scan the newly added tables or not.
-     */
-    public OracleSourceBuilder<T> scanNewlyAddedTableEnabled(boolean scanNewlyAddedTableEnabled) {
+    /** Whether the {@link DamengIncrementalSource} should scan the newly added tables or not. */
+    public DamengSourceBuilder<T> scanNewlyAddedTableEnabled(boolean scanNewlyAddedTableEnabled) {
         this.configFactory.scanNewlyAddedTableEnabled(scanNewlyAddedTableEnabled);
         return this;
     }
 
     /**
-     * Whether the {@link OracleIncrementalSource} should assign the unbounded chunks first or not
+     * Whether the {@link DamengIncrementalSource} should assign the unbounded chunks first or not
      * during snapshot reading phase.
      */
-    public OracleSourceBuilder<T> assignUnboundedChunkFirst(boolean assignUnboundedChunkFirst) {
+    public DamengSourceBuilder<T> assignUnboundedChunkFirst(boolean assignUnboundedChunkFirst) {
         this.configFactory.assignUnboundedChunkFirst(assignUnboundedChunkFirst);
         return this;
     }
 
     /**
-     * Build the {@link OracleIncrementalSource}.
+     * Build the {@link DamengIncrementalSource}.
      *
      * @return a OracleParallelSource with the settings made for this builder.
      */
-    public OracleIncrementalSource<T> build() {
+    public DamengIncrementalSource<T> build() {
         this.offsetFactory = new RedoLogOffsetFactory();
         //  this.dialect = new OracleDialect();
 
-        return new OracleIncrementalSource<T>(configFactory, checkNotNull(deserializer), offsetFactory,
+        return new DamengIncrementalSource<T>(
+                configFactory,
+                checkNotNull(deserializer),
+                offsetFactory,
                 Objects.requireNonNull(dialect, "dialect can not be null"));
     }
 
-    /**
-     * The {@link JdbcIncrementalSource} implementation for Oracle.
-     */
-    public static class OracleIncrementalSource<T> extends JdbcIncrementalSource<T> {
+    /** The {@link JdbcIncrementalSource} implementation for Oracle. */
+    public static class DamengIncrementalSource<T> extends JdbcIncrementalSource<T> {
 
-        public OracleIncrementalSource(OracleSourceConfigFactory configFactory,
-                                       DebeziumDeserializationSchema<T> deserializationSchema,
-                                       RedoLogOffsetFactory offsetFactory, OracleDialect dataSourceDialect) {
+        public DamengIncrementalSource(
+                DamengSourceConfigFactory configFactory,
+                DebeziumDeserializationSchema<T> deserializationSchema,
+                RedoLogOffsetFactory offsetFactory,
+                DamengDialect dataSourceDialect) {
             super(configFactory, deserializationSchema, offsetFactory, dataSourceDialect);
         }
 
-        public static <T> OracleSourceBuilder<T> builder() {
-            return builder(new OracleSourceConfigFactory(), new OracleDialect());
+        public static <T> DamengSourceBuilder<T> builder() {
+            return builder(new DamengSourceConfigFactory(), new DamengDialect());
         }
 
-        public static <T> OracleSourceBuilder<T> builder(OracleSourceConfigFactory configFactory,
-                                                         OracleDialect dialect) {
-            return new OracleSourceBuilder<>(configFactory, dialect);
+        public static <T> DamengSourceBuilder<T> builder(
+                DamengSourceConfigFactory configFactory, DamengDialect dialect) {
+            return new DamengSourceBuilder<>(configFactory, dialect);
         }
     }
+
+    //    public static void main(String[] args) {
+    //        DamengIncrementalSource<DTO> incrSource
+    //                = DamengIncrementalSource.builder()
+    //                .hostname("")
+    //                .password("")
+    //                .username("")
+    //                .build();
+    //    }
 }

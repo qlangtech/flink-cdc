@@ -15,13 +15,13 @@
  * limitations under the License.
  */
 
-package org.apache.flink.cdc.connectors.oracle.source.config;
+package org.apache.flink.cdc.connectors.dameng.source.config;
 
 import org.apache.flink.cdc.connectors.base.config.JdbcSourceConfigFactory;
 import org.apache.flink.cdc.connectors.base.source.EmbeddedFlinkDatabaseHistory;
 
 import io.debezium.config.Configuration;
-import io.debezium.connector.oracle.OracleConnector;
+import org.devlive.connector.dameng.DamengConnector;
 
 import javax.annotation.Nullable;
 
@@ -33,17 +33,17 @@ import java.util.UUID;
 import static org.apache.flink.cdc.connectors.base.utils.EnvironmentUtils.checkSupportCheckpointsAfterTasksFinished;
 import static org.apache.flink.util.Preconditions.checkNotNull;
 
-/** A factory to initialize {@link OracleSourceConfig}. */
-public class OracleSourceConfigFactory extends JdbcSourceConfigFactory {
+/** A factory to initialize {@link DamengSourceConfig}. */
+public class DamengSourceConfigFactory extends JdbcSourceConfigFactory {
 
     private static final long serialVersionUID = 1L;
-    private static final String DATABASE_SERVER_NAME = "oracle_logminer";
-    private static final String DRIVER_ClASS_NAME = "oracle.jdbc.OracleDriver";
+    private static final String DATABASE_SERVER_NAME = "dameng_logminer";
+    private static final String DRIVER_ClASS_NAME = "dm.jdbc.driver.DmDriver";
 
     @Nullable private String url;
     private List<String> schemaList;
 
-    /** Url to use when connecting to the Oracle database server. */
+    /** Url to use when connecting to the Dameng database server. */
     public JdbcSourceConfigFactory url(@Nullable String url) {
         this.url = url;
         return this;
@@ -59,12 +59,12 @@ public class OracleSourceConfigFactory extends JdbcSourceConfigFactory {
         return this;
     }
 
-    /** Creates a new {@link OracleSourceConfig} for the given subtask {@code subtaskId}. */
-    public OracleSourceConfig create(int subtaskId) {
+    /** Creates a new {@link DamengSourceConfig} for the given subtask {@code subtaskId}. */
+    public DamengSourceConfig create(int subtaskId) {
         checkSupportCheckpointsAfterTasksFinished(closeIdleReaders);
         Properties props = new Properties();
         props.setProperty("connector.class", getConnectorClass().getCanonicalName());
-        // Logical name that identifies and provides a namespace for the particular Oracle
+        // Logical name that identifies and provides a namespace for the particular Dameng
         // database server being
         // monitored. The logical name should be unique across all other connectors, since it is
         // used as a prefix
@@ -109,7 +109,7 @@ public class OracleSourceConfigFactory extends JdbcSourceConfigFactory {
         }
 
         Configuration dbzConfiguration = Configuration.from(props);
-        return new OracleSourceConfig(
+        return new DamengSourceConfig(
                 startupOptions,
                 databaseList,
                 tableList,
@@ -138,7 +138,7 @@ public class OracleSourceConfigFactory extends JdbcSourceConfigFactory {
                 assignUnboundedChunkFirst);
     }
 
-    protected  Class<?> getConnectorClass() {
-        return OracleConnector.class;
+    protected Class<?> getConnectorClass() {
+        return DamengConnector.class;
     }
 }
