@@ -238,8 +238,21 @@ public class BinlogOffset implements Comparable<BinlogOffset>, Serializable {
         }
 
         // First compare the MySQL binlog filenames
-        if (this.getFilename().compareToIgnoreCase(that.getFilename()) != 0) {
-            return this.getFilename().compareToIgnoreCase(that.getFilename());
+        // Handle null filenames gracefully (e.g., for LATEST/TIMESTAMP offsets)
+        String thisFilename = this.getFilename();
+        String thatFilename = that.getFilename();
+
+        // If both filenames are null, they're equal - continue to position comparison
+        if (thisFilename == null && thatFilename == null) {
+            // Fall through to position comparison below
+        } else if (thisFilename == null) {
+            // Offset without filename is considered earlier
+            return -1;
+        } else if (thatFilename == null) {
+            // Offset with filename is considered later
+            return 1;
+        } else if (thisFilename.compareToIgnoreCase(thatFilename) != 0) {
+            return thisFilename.compareToIgnoreCase(thatFilename);
         }
 
         // The filenames are the same, so compare the positions
