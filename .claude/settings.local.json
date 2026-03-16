@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -rn \"sendRequestToCoordinator\\\\|toCoordinator\" /opt/misc/flink-cdc/flink-cdc-runtime/src/main/java/org/apache/flink/cdc/runtime/operators/ --include=*.java)",
+      "Bash(find /opt/misc/flink-cdc -path */flink-runtime*.jar -o -path */flink-core*.jar)"
+    ]
+  }
+}
