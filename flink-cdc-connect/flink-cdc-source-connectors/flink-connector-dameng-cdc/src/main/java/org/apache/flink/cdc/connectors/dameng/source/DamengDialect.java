@@ -55,6 +55,7 @@ public class DamengDialect implements JdbcDataSourceDialect {
 
     private static final long serialVersionUID = 1L;
     private transient DamengSchema damengSchema;
+
     /**
      * Get current SCN from Dameng database. Dameng database provides
      * DBMS_FLASHBACK.GET_SYSTEM_CHANGE_NUMBER() function to get current SCN.

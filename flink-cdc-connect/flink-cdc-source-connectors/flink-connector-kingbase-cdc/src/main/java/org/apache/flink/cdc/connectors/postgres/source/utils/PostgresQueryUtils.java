@@ -294,7 +294,7 @@ public class PostgresQueryUtils {
     private static void addPrimaryKeyColumnsToCondition(
             RowType pkRowType, StringBuilder sql, String predicate, List<String> uuidFields) {
         for (Iterator<String> fieldNamesIt = pkRowType.getFieldNames().iterator();
-             fieldNamesIt.hasNext(); ) {
+                fieldNamesIt.hasNext(); ) {
             String fieldName = fieldNamesIt.next();
             boolean isUUID = uuidFields.contains(fieldName);
             sql.append(quote(fieldName)).append(predicate).append(castParam(isUUID));
@@ -307,7 +307,7 @@ public class PostgresQueryUtils {
     private static String getPrimaryKeyColumnsProjection(RowType pkRowType) {
         StringBuilder sql = new StringBuilder();
         for (Iterator<String> fieldNamesIt = pkRowType.getFieldNames().iterator();
-             fieldNamesIt.hasNext(); ) {
+                fieldNamesIt.hasNext(); ) {
             sql.append(quote(fieldNamesIt.next()));
             if (fieldNamesIt.hasNext()) {
                 sql.append(" , ");
@@ -319,7 +319,7 @@ public class PostgresQueryUtils {
     private static String getMaxPrimaryKeyColumnsProjection(RowType pkRowType) {
         StringBuilder sql = new StringBuilder();
         for (Iterator<String> fieldNamesIt = pkRowType.getFieldNames().iterator();
-             fieldNamesIt.hasNext(); ) {
+                fieldNamesIt.hasNext(); ) {
             sql.append("MAX(" + quote(fieldNamesIt.next()) + ")");
             if (fieldNamesIt.hasNext()) {
                 sql.append(" , ");

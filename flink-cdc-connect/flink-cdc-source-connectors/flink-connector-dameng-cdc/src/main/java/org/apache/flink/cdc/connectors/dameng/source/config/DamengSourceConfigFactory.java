@@ -135,7 +135,9 @@ public class DamengSourceConfigFactory extends JdbcSourceConfigFactory {
                 chunkKeyColumn,
                 skipSnapshotBackfill,
                 scanNewlyAddedTableEnabled,
-                assignUnboundedChunkFirst);
+                assignUnboundedChunkFirst,
+                // inherited protected field from JdbcSourceConfigFactory
+                releaseSnapshotMetadataEnabled);
     }
 
     protected Class<?> getConnectorClass() {

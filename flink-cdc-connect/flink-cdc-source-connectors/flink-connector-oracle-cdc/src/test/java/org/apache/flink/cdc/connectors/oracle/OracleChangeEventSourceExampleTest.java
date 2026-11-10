@@ -74,10 +74,10 @@ class OracleChangeEventSourceExampleTest extends OracleSourceTestBase {
         Properties debeziumProperties = new Properties();
         debeziumProperties.setProperty("log.mining.strategy", "online_catalog");
 
-        OracleSourceBuilder<String> builder =      OracleSourceBuilder.OracleIncrementalSource.builder();
+        OracleSourceBuilder<String> builder = OracleSourceBuilder.OracleIncrementalSource.builder();
         JdbcIncrementalSource<String> oracleChangeEventSource =
                 builder
-               // new OracleSourceBuilder<String>()
+                        // new OracleSourceBuilder<String>()
                         .hostname(ORACLE_CONTAINER.getHost())
                         .port(ORACLE_CONTAINER.getOraclePort())
                         .databaseList(ORACLE_DATABASE)

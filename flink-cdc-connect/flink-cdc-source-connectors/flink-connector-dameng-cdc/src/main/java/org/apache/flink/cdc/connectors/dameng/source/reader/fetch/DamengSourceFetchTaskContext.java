@@ -26,6 +26,7 @@ import org.apache.flink.cdc.connectors.base.source.meta.offset.Offset;
 import org.apache.flink.cdc.connectors.base.source.meta.split.SourceSplitBase;
 import org.apache.flink.cdc.connectors.base.source.reader.external.JdbcSourceFetchTaskContext;
 import org.apache.flink.cdc.connectors.base.utils.SourceRecordUtils;
+import org.apache.flink.cdc.connectors.base.utils.SplitKeyUtils;
 import org.apache.flink.cdc.connectors.dameng.source.config.DamengSourceConfig;
 import org.apache.flink.cdc.connectors.dameng.source.handler.DamengSchemaChangeEventHandler;
 import org.apache.flink.cdc.connectors.dameng.source.meta.offset.RedoLogOffset;
@@ -225,12 +226,11 @@ public class DamengSourceFetchTaskContext extends JdbcSourceFetchTaskContext {
                 LOG.error("{} can not convert to RowId", record);
             }
             Object[] rowIds = new ROWID[] {rowId};
-            return SourceRecordUtils.splitKeyRangeContains(rowIds, splitStart, splitEnd);
+            return SplitKeyUtils.splitKeyRangeContains(rowIds, splitStart, splitEnd);
         } else {
             // config chunk key column compare
-            Object[] key =
-                    SourceRecordUtils.getSplitKey(splitKeyType, record, getSchemaNameAdjuster());
-            return SourceRecordUtils.splitKeyRangeContains(key, splitStart, splitEnd);
+            Object[] key = SplitKeyUtils.getSplitKey(splitKeyType, record, getSchemaNameAdjuster());
+            return SplitKeyUtils.splitKeyRangeContains(key, splitStart, splitEnd);
         }
     }
 

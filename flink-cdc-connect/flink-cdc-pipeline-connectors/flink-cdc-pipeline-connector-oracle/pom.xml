@@ -151,7 +151,7 @@ limitations under the License.
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-connector-oracle-cdc</artifactId>
+            <artifactId>flink-connector-oracle-cdc-tis</artifactId>
             <version>${parent.version}</version>
         </dependency>
 

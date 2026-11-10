@@ -22,7 +22,6 @@ import org.apache.flink.api.connector.sink2.Committer;
 import org.apache.paimon.flink.FlinkCatalogFactory;
 import org.apache.paimon.flink.sink.MultiTableCommittable;
 import org.apache.paimon.flink.sink.StoreMultiCommitter;
-import org.apache.paimon.flink.utils.RuntimeContextUtils;
 import org.apache.paimon.manifest.WrappedManifestCommittable;
 import org.apache.paimon.options.Options;
 import org.slf4j.Logger;
@@ -32,7 +31,6 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /** A {@link Committer} to commit write results for multiple tables. */

@@ -36,7 +36,7 @@ limitations under the License.
 
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-connector-mysql-cdc</artifactId>
+            <artifactId>flink-connector-mysql-cdc-tis</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

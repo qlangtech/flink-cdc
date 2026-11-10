@@ -133,7 +133,9 @@ public class PostgresSourceConfigFactory extends JdbcSourceConfigFactory {
                 skipSnapshotBackfill,
                 scanNewlyAddedTableEnabled,
                 lsnCommitCheckpointsDelay,
-                assignUnboundedChunkFirst);
+                assignUnboundedChunkFirst,
+                // inherited protected field from JdbcSourceConfigFactory
+                releaseSnapshotMetadataEnabled);
     }
 
     /**

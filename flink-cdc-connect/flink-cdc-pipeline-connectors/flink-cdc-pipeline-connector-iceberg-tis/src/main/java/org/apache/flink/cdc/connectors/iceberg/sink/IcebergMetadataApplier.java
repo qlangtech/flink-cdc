@@ -125,6 +125,9 @@ public class IcebergMetadataApplier implements MetadataApplier {
                 },
                 truncateTableEvent -> {
                     throw new UnsupportedSchemaChangeEventException(truncateTableEvent);
+                },
+                alterTableCommentEvent -> {
+                    throw new UnsupportedSchemaChangeEventException(alterTableCommentEvent);
                 });
     }
 
@@ -175,10 +178,10 @@ public class IcebergMetadataApplier implements MetadataApplier {
     }
 
     /**
-     * 把一个分区项应用到 {@link PartitionSpec.Builder} 上。
-     * <p>
-     * 支持 {@code transform:column} 形式（year / month / day / hour / identity），
-     * 不写 transform 时按 identity 处理，与上游 flink-cdc 的行为保持一致。
+     * 把一个分区项应用到 {@link PartitionSpec.Builder} 上.
+     *
+     * <p>支持 {@code transform:column} 形式（year / month / day / hour / identity）， 不写 transform 时按
+     * identity 处理，与上游 flink-cdc 的行为保持一致。
      */
     private static void applyPartition(PartitionSpec.Builder builder, String partitionColumn) {
         int colonPos = partitionColumn.indexOf(':');

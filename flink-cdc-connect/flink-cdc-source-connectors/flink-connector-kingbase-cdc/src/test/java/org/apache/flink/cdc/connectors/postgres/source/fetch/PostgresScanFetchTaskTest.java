@@ -314,7 +314,8 @@ public class PostgresScanFetchTaskTest extends PostgresTestBase {
     }
 
     private List<SnapshotSplit> getSnapshotSplits(
-            PostgresSourceConfig sourceConfig, JdbcDataSourceDialect sourceDialect) {
+            PostgresSourceConfig sourceConfig, JdbcDataSourceDialect sourceDialect)
+            throws Exception {
         List<TableId> discoverTables = sourceDialect.discoverDataCollections(sourceConfig);
         final ChunkSplitter chunkSplitter = sourceDialect.createChunkSplitter(sourceConfig);
 

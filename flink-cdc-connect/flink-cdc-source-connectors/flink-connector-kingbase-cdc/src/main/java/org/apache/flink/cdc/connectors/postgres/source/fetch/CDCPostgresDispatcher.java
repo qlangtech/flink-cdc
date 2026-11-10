@@ -17,6 +17,12 @@
 
 package org.apache.flink.cdc.connectors.postgres.source.fetch;
 
+import org.apache.flink.cdc.connectors.base.WatermarkDispatcher;
+import org.apache.flink.cdc.connectors.base.source.meta.offset.Offset;
+import org.apache.flink.cdc.connectors.base.source.meta.split.SourceSplitBase;
+import org.apache.flink.cdc.connectors.base.source.meta.wartermark.WatermarkEvent;
+import org.apache.flink.cdc.connectors.base.source.meta.wartermark.WatermarkKind;
+
 import io.debezium.connector.base.ChangeEventQueue;
 import io.debezium.connector.postgresql.PostgresConnectorConfig;
 import io.debezium.connector.postgresql.PostgresEventDispatcher;
@@ -29,11 +35,6 @@ import io.debezium.schema.DataCollectionFilters;
 import io.debezium.schema.DatabaseSchema;
 import io.debezium.schema.TopicSelector;
 import io.debezium.util.SchemaNameAdjuster;
-import org.apache.flink.cdc.connectors.base.WatermarkDispatcher;
-import org.apache.flink.cdc.connectors.base.source.meta.offset.Offset;
-import org.apache.flink.cdc.connectors.base.source.meta.split.SourceSplitBase;
-import org.apache.flink.cdc.connectors.base.source.meta.wartermark.WatermarkEvent;
-import org.apache.flink.cdc.connectors.base.source.meta.wartermark.WatermarkKind;
 import org.apache.kafka.connect.source.SourceRecord;
 
 import java.util.Map;

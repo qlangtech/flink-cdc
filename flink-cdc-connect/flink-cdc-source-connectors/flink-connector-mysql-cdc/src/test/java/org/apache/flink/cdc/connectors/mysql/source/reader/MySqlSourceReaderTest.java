@@ -22,6 +22,7 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.connector.source.ReaderOutput;
 import org.apache.flink.api.connector.source.SourceOutput;
 import org.apache.flink.api.connector.source.SourceReaderContext;
+import org.apache.flink.cdc.connectors.base.source.metrics.SourceReaderMetrics;
 import org.apache.flink.cdc.connectors.mysql.debezium.DebeziumUtils;
 import org.apache.flink.cdc.connectors.mysql.source.MySqlSourceTestBase;
 import org.apache.flink.cdc.connectors.mysql.source.assigners.MySqlBinlogSplitAssigner;
@@ -32,7 +33,6 @@ import org.apache.flink.cdc.connectors.mysql.source.events.BinlogSplitMetaAssemb
 import org.apache.flink.cdc.connectors.mysql.source.events.BinlogSplitMetaEvent;
 import org.apache.flink.cdc.connectors.mysql.source.events.FinishedSnapshotSplitsAckEvent;
 import org.apache.flink.cdc.connectors.mysql.source.events.LatestFinishedSplitsNumberRequestEvent;
-import org.apache.flink.cdc.connectors.base.source.metrics.SourceReaderMetrics;
 import org.apache.flink.cdc.connectors.mysql.source.offset.BinlogOffset;
 import org.apache.flink.cdc.connectors.mysql.source.split.FinishedSnapshotSplitInfo;
 import org.apache.flink.cdc.connectors.mysql.source.split.MySqlBinlogSplit;

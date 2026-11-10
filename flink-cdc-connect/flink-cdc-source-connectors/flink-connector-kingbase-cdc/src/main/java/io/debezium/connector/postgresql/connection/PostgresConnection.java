@@ -6,6 +6,12 @@
 
 package io.debezium.connector.postgresql.connection;
 
+import com.kingbase8.core.BaseConnection;
+import com.kingbase8.jdbc.KbConnection;
+import com.kingbase8.jdbc.TimestampUtils;
+import com.kingbase8.replication.LogSequenceNumber;
+import com.kingbase8.util.KBmoney;
+import com.kingbase8.util.KSQLState;
 import com.zaxxer.hikari.pool.HikariProxyConnection;
 import io.debezium.DebeziumException;
 import io.debezium.annotation.VisibleForTesting;
@@ -29,12 +35,6 @@ import io.debezium.schema.DatabaseSchema;
 import io.debezium.util.Clock;
 import io.debezium.util.Metronome;
 import org.apache.kafka.connect.errors.ConnectException;
-import com.kingbase8.core.BaseConnection;
-import com.kingbase8.jdbc.KbConnection;
-import com.kingbase8.jdbc.TimestampUtils;
-import com.kingbase8.replication.LogSequenceNumber;
-import com.kingbase8.util.KBmoney;
-import com.kingbase8.util.KSQLState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,17 +57,17 @@ import java.util.regex.Pattern;
  * {@link JdbcConnection} connection extension used for connecting to Postgres instances.
  *
  * @author Horia Chiorean
- * <p>Copied from Debezium 1.9.8-Final with three additional methods:
- * <ul>
- *   <li>Constructor PostgresConnection( Configuration config, PostgresValueConverterBuilder
- *       valueConverterBuilder, ConnectionFactory factory) to allow passing a custom
- *       ConnectionFactory
- *   <li>override connection() to return a unwrapped KbConnection (otherwise, it will complain
- *       about HikariProxyConnection cannot be cast to class org.postgresql.core.BaseConnection)
- *   <li>override isTableUniqueIndexIncluded: Copied DBZ-5398 from Debezium 2.0.0.Final to fix
- *       https://github.com/ververica/flink-cdc-connectors/issues/2710. Remove this comment
- *       after bumping debezium version to 2.0.0.Final.
- * </ul>
+ *     <p>Copied from Debezium 1.9.8-Final with three additional methods:
+ *     <ul>
+ *       <li>Constructor PostgresConnection( Configuration config, PostgresValueConverterBuilder
+ *           valueConverterBuilder, ConnectionFactory factory) to allow passing a custom
+ *           ConnectionFactory
+ *       <li>override connection() to return a unwrapped KbConnection (otherwise, it will complain
+ *           about HikariProxyConnection cannot be cast to class org.postgresql.core.BaseConnection)
+ *       <li>override isTableUniqueIndexIncluded: Copied DBZ-5398 from Debezium 2.0.0.Final to fix
+ *           https://github.com/ververica/flink-cdc-connectors/issues/2710. Remove this comment
+ *           after bumping debezium version to 2.0.0.Final.
+ *     </ul>
  */
 public class PostgresConnection extends JdbcConnection {
 
@@ -92,15 +92,17 @@ public class PostgresConnection extends JdbcConnection {
                     + "}/${"
                     + JdbcConfiguration.DATABASE
                     + "}";
-    protected static final ConnectionFactory FACTORY = (config) -> {
-        throw new UnsupportedOperationException();
-    };
-//             JdbcConnection.patternBasedFactory(
-//                    URL_PATTERN,
-//                    "com.kingbase8.Driver",
-//                    PostgresConnection.class.getClassLoader(),
-//                    JdbcConfiguration.PORT.withDefault(
-//                            PostgresConnectorConfig.PORT.defaultValueAsString()));
+    protected static final ConnectionFactory FACTORY =
+            (config) -> {
+                throw new UnsupportedOperationException();
+            };
+
+    //             JdbcConnection.patternBasedFactory(
+    //                    URL_PATTERN,
+    //                    "com.kingbase8.Driver",
+    //                    PostgresConnection.class.getClassLoader(),
+    //                    JdbcConfiguration.PORT.withDefault(
+    //                            PostgresConnectorConfig.PORT.defaultValueAsString()));
 
     /**
      * Obtaining a replication slot may fail if there's a pending transaction. We're retrying to get
@@ -120,16 +122,21 @@ public class PostgresConnection extends JdbcConnection {
      * KingBaseValueConverter}, and will provide its own {@link TypeRegistry}. Usually only one such
      * connection per connector is needed.
      *
-     * @param config                {@link Configuration} instance, may not be null.
+     * @param config {@link Configuration} instance, may not be null.
      * @param valueConverterBuilder supplies a configured {@link KingBaseValueConverter} for a given
-     *                              {@link TypeRegistry}
-     * @param connectionUsage       a symbolic name of the connection to be tracked in monitoring tools
+     *     {@link TypeRegistry}
+     * @param connectionUsage a symbolic name of the connection to be tracked in monitoring tools
      */
     public PostgresConnection(
             JdbcConfiguration config,
             PostgresValueConverterBuilder valueConverterBuilder,
             String connectionUsage) {
-        this(config, valueConverterBuilder, connectionUsage, () -> PostgresConnection.class.getClassLoader(), FACTORY);
+        this(
+                config,
+                valueConverterBuilder,
+                connectionUsage,
+                () -> PostgresConnection.class.getClassLoader(),
+                FACTORY);
     }
 
     /**
@@ -138,10 +145,10 @@ public class PostgresConnection extends JdbcConnection {
      * KingBaseValueConverter}, and will provide its own {@link TypeRegistry}. Usually only one such
      * connection per connector is needed.
      *
-     * @param config                {@link Configuration} instance, may not be null.
+     * @param config {@link Configuration} instance, may not be null.
      * @param valueConverterBuilder supplies a configured {@link KingBaseValueConverter} for a given
-     *                              {@link TypeRegistry}
-     * @param connectionUsage       a symbolic name of the connection to be tracked in monitoring tools
+     *     {@link TypeRegistry}
+     * @param connectionUsage a symbolic name of the connection to be tracked in monitoring tools
      */
     public PostgresConnection(
             JdbcConfiguration config,
@@ -173,8 +180,8 @@ public class PostgresConnection extends JdbcConnection {
     /**
      * Create a Postgres connection using the supplied configuration and {@link TypeRegistry}
      *
-     * @param config          {@link Configuration} instance, may not be null.
-     * @param typeRegistry    an existing/already-primed {@link TypeRegistry} instance
+     * @param config {@link Configuration} instance, may not be null.
+     * @param typeRegistry an existing/already-primed {@link TypeRegistry} instance
      * @param connectionUsage a symbolic name of the connection to be tracked in monitoring tools
      */
     public PostgresConnection(
@@ -202,16 +209,14 @@ public class PostgresConnection extends JdbcConnection {
      * Creates a Postgres connection using the supplied configuration. The connector is the regular
      * one without datatype resolution capabilities.
      *
-     * @param config          {@link Configuration} instance, may not be null.
+     * @param config {@link Configuration} instance, may not be null.
      * @param connectionUsage a symbolic name of the connection to be tracked in monitoring tools
      */
     public PostgresConnection(JdbcConfiguration config, String connectionUsage) {
         this(config, null, connectionUsage);
     }
 
-    /**
-     * Return an unwrapped KbConnection instead of HikariProxyConnection
-     */
+    /** Return an unwrapped KbConnection instead of HikariProxyConnection */
     @Override
     public synchronized Connection connection() throws SQLException {
         Connection conn = connection(true);
@@ -238,7 +243,7 @@ public class PostgresConnection extends JdbcConnection {
      * Returns a JDBC connection string for the current configuration.
      *
      * @return a {@code String} where the variables in {@code urlPattern} are replaced with values
-     * from the configuration
+     *     from the configuration
      */
     public String connectionString() {
         return connectionString(URL_PATTERN);
@@ -251,7 +256,7 @@ public class PostgresConnection extends JdbcConnection {
      * @param tableId the identifier of the table
      * @return the replica identity information; never null
      * @throws SQLException if there is a problem obtaining the replica identity information for the
-     *                      given table
+     *     given table
      */
     public ServerInfo.ReplicaIdentity readReplicaIdentityInfo(TableId tableId) throws SQLException {
         String statement =
@@ -284,7 +289,7 @@ public class PostgresConnection extends JdbcConnection {
     /**
      * Returns the current state of the replication slot
      *
-     * @param slotName   the name of the slot
+     * @param slotName the name of the slot
      * @param pluginName the name of the plugin used for the desired slot
      * @return the {@link SlotState} or null, if no slot state is found
      * @throws SQLException
@@ -309,10 +314,10 @@ public class PostgresConnection extends JdbcConnection {
     /**
      * Fetches the state of a replication stage given a slot name and plugin name
      *
-     * @param slotName   the name of the slot
+     * @param slotName the name of the slot
      * @param pluginName the name of the plugin used for the desired slot
      * @return the {@link ServerInfo.ReplicationSlot} object or a {@link
-     * ServerInfo.ReplicationSlot#INVALID} if the slot is not valid
+     *     ServerInfo.ReplicationSlot#INVALID} if the slot is not valid
      * @throws SQLException is thrown by the underlying JDBC
      */
     private ServerInfo.ReplicationSlot fetchReplicationSlotInfo(String slotName, String pluginName)
@@ -358,13 +363,13 @@ public class PostgresConnection extends JdbcConnection {
      * <p>To fetch the slot without the retries, use the {@link
      * PostgresConnection#fetchReplicationSlotInfo} call
      *
-     * @param slotName   the slot name
+     * @param slotName the slot name
      * @param pluginName the name of the plugin
      * @return the {@link ServerInfo.ReplicationSlot} object or a {@link
-     * ServerInfo.ReplicationSlot#INVALID} if the slot is not valid
-     * @throws SQLException         is thrown by the underyling jdbc driver
+     *     ServerInfo.ReplicationSlot#INVALID} if the slot is not valid
+     * @throws SQLException is thrown by the underyling jdbc driver
      * @throws InterruptedException is thrown if we don't return an answer within the set number of
-     *                              retries
+     *     retries
      */
     @VisibleForTesting
     ServerInfo.ReplicationSlot readReplicationSlotInfo(String slotName, String pluginName)
@@ -705,7 +710,7 @@ public class PostgresConnection extends JdbcConnection {
         final String columnName = columnMetadata.getString(4);
         if (columnFilter == null
                 || columnFilter.matches(
-                tableId.catalog(), tableId.schema(), tableId.table(), columnName)) {
+                        tableId.catalog(), tableId.schema(), tableId.table(), columnName)) {
             final ColumnEditor column = Column.editor().name(columnName);
             column.type(columnMetadata.getString(6));
 
@@ -812,8 +817,8 @@ public class PostgresConnection extends JdbcConnection {
                             ? value.get()
                             : new SpecialValueDecimal(rs.getBigDecimal(columnIndex));
                 case PgOid.TIME:
-                    // To handle time 24:00:00 supported by TIME columns, read the column as a
-                    // string.
+                // To handle time 24:00:00 supported by TIME columns, read the column as a
+                // string.
                 case PgOid.TIMETZ:
                     // In order to guarantee that we resolve TIMETZ columns with proper microsecond
                     // precision,
@@ -837,7 +842,7 @@ public class PostgresConnection extends JdbcConnection {
 
     @Override
     protected String[] supportedTableTypes() {
-        return new String[]{"VIEW", "MATERIALIZED VIEW", "TABLE", "PARTITIONED TABLE"};
+        return new String[] {"VIEW", "MATERIALIZED VIEW", "TABLE", "PARTITIONED TABLE"};
     }
 
     @Override
@@ -862,7 +867,7 @@ public class PostgresConnection extends JdbcConnection {
      * @throws SQLException if a database exception occurred
      */
     public Set<TableId> getAllTableIds(String catalogName) throws SQLException {
-        return readTableNames(catalogName, null, null, new String[]{"TABLE", "PARTITIONED TABLE"});
+        return readTableNames(catalogName, null, null, new String[] {"TABLE", "PARTITIONED TABLE"});
     }
 
     @FunctionalInterface

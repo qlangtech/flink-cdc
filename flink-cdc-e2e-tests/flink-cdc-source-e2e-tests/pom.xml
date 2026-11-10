@@ -72,7 +72,7 @@ limitations under the License.
         <!-- CDC connectors test utils -->
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-connector-mysql-cdc</artifactId>
+            <artifactId>flink-connector-mysql-cdc-tis</artifactId>
             <version>${project.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
@@ -86,7 +86,7 @@ limitations under the License.
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-connector-oracle-cdc</artifactId>
+            <artifactId>flink-connector-oracle-cdc-tis</artifactId>
             <version>${project.version}</version>
             <type>test-jar</type>
             <scope>test</scope>

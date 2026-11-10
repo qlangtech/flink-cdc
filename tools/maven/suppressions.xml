@@ -30,7 +30,11 @@ limitations under the License.
 	<!-- Classes copied from debezium -->
 	<suppress files="io[\\/]debezium[\\/]connector[\\/]postgresql[\\/]" checks=".*"/>
 	<suppress files="io[\\/]debezium[\\/]" checks=".*"/>
-	
+
+	<!-- Kingbase tests are vendored from an older postgres-cdc and still use JUnit 4;
+	     migrate them to JUnit 5 + AssertJ as follow-up work -->
+	<suppress files="flink-connector-kingbase-cdc[\\/]src[\\/]test[\\/]" checks="IllegalImport"/>
+
 	<!-- target directory is not relevant for checkstyle -->
 	<suppress files="[\\/]target[\\/]" checks=".*"/>
 </suppressions>

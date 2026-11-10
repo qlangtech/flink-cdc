@@ -148,7 +148,7 @@ public class PostgresStreamFetchTask implements FetchTask<SourceSplitBase> {
 
             if (commitLsn != null
                     && (lastCommitLsn == null
-                    || Lsn.valueOf(commitLsn).compareTo(Lsn.valueOf(lastCommitLsn)) > 0)) {
+                            || Lsn.valueOf(commitLsn).compareTo(Lsn.valueOf(lastCommitLsn)) > 0)) {
                 lastCommitLsn = commitLsn;
 
                 Map<String, Object> offsets = new HashMap<>();

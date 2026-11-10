@@ -49,9 +49,7 @@ import java.util.Map;
 import static org.apache.flink.cdc.connectors.oracle.source.utils.OracleConnectionUtils.createOracleConnection;
 import static org.apache.flink.cdc.connectors.oracle.source.utils.OracleConnectionUtils.currentRedoLogOffset;
 
-/**
- * The {@link JdbcDataSourceDialect} implementation for Oracle datasource.
- */
+/** The {@link JdbcDataSourceDialect} implementation for Oracle datasource. */
 @Experimental
 public class OracleDialect implements JdbcDataSourceDialect {
 
@@ -68,7 +66,8 @@ public class OracleDialect implements JdbcDataSourceDialect {
     @Override
     public final Offset displayCurrentOffset(JdbcSourceConfig sourceConfig) {
         try (JdbcConnection jdbcConnection = openJdbcConnection(sourceConfig)) {
-            return currentRedoLogOffset(getQueryCurrentRedoLogOffsetSQLShowCurrentScn(), jdbcConnection);
+            return currentRedoLogOffset(
+                    getQueryCurrentRedoLogOffsetSQLShowCurrentScn(), jdbcConnection);
         } catch (Exception e) {
             throw new FlinkRuntimeException("Read the redoLog offset error", e);
         }
@@ -90,16 +89,19 @@ public class OracleDialect implements JdbcDataSourceDialect {
 
     @Override
     public JdbcConnection openJdbcConnection(JdbcSourceConfig sourceConfig) {
-        return OracleConnectionUtils.createOracleConnection(sourceConfig.getDbzConnectorConfig().getJdbcConfig());
+        return OracleConnectionUtils.createOracleConnection(
+                sourceConfig.getDbzConnectorConfig().getJdbcConfig());
     }
 
     @Override
     public ChunkSplitter createChunkSplitter(JdbcSourceConfig sourceConfig) {
-        return new OracleChunkSplitter(sourceConfig, this, ChunkSplitterState.NO_SPLITTING_TABLE_STATE);
+        return new OracleChunkSplitter(
+                sourceConfig, this, ChunkSplitterState.NO_SPLITTING_TABLE_STATE);
     }
 
     @Override
-    public ChunkSplitter createChunkSplitter(JdbcSourceConfig sourceConfig, ChunkSplitterState chunkSplitterState) {
+    public ChunkSplitter createChunkSplitter(
+            JdbcSourceConfig sourceConfig, ChunkSplitterState chunkSplitterState) {
         return new OracleChunkSplitter(sourceConfig, this, chunkSplitterState);
     }
 
@@ -112,7 +114,8 @@ public class OracleDialect implements JdbcDataSourceDialect {
     public List<TableId> discoverDataCollections(JdbcSourceConfig sourceConfig) {
         OracleSourceConfig oracleSourceConfig = (OracleSourceConfig) sourceConfig;
         try (JdbcConnection jdbcConnection = openJdbcConnection(sourceConfig)) {
-            return OracleConnectionUtils.listTables(jdbcConnection, oracleSourceConfig.getTableFilters());
+            return OracleConnectionUtils.listTables(
+                    jdbcConnection, oracleSourceConfig.getTableFilters());
         } catch (SQLException e) {
             throw new FlinkRuntimeException("Error to discover tables: " + e.getMessage(), e);
         }
@@ -132,7 +135,8 @@ public class OracleDialect implements JdbcDataSourceDialect {
             }
             return tableSchemas;
         } catch (Exception e) {
-            throw new FlinkRuntimeException("Error to discover table schemas: " + e.getMessage(), e);
+            throw new FlinkRuntimeException(
+                    "Error to discover table schemas: " + e.getMessage(), e);
         }
     }
 

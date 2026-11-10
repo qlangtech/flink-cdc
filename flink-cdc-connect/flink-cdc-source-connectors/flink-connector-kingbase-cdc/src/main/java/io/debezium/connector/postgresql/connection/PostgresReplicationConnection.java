@@ -6,6 +6,11 @@
 
 package io.debezium.connector.postgresql.connection;
 
+import com.kingbase8.core.BaseConnection;
+import com.kingbase8.core.ServerVersion;
+import com.kingbase8.replication.KBReplicationStream;
+import com.kingbase8.replication.fluent.logical.ChainedLogicalStreamBuilder;
+import com.kingbase8.util.KSQLException;
 import io.debezium.DebeziumException;
 import io.debezium.connector.postgresql.PostgresConnectorConfig;
 import io.debezium.connector.postgresql.PostgresSchema;
@@ -19,11 +24,6 @@ import io.debezium.relational.TableId;
 import io.debezium.util.Clock;
 import io.debezium.util.Metronome;
 import org.apache.kafka.connect.errors.ConnectException;
-import com.kingbase8.core.BaseConnection;
-import com.kingbase8.core.ServerVersion;
-import com.kingbase8.replication.KBReplicationStream;
-import com.kingbase8.replication.fluent.logical.ChainedLogicalStreamBuilder;
-import com.kingbase8.util.KSQLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,25 +85,25 @@ public class PostgresReplicationConnection extends JdbcConnection implements Rep
     /**
      * Creates a new replication connection with the given params.
      *
-     * @param config                    the JDBC configuration for the connection; may not be null
-     * @param slotName                  the name of the DB slot for logical replication; may not be null
-     * @param publicationName           the name of the DB publication for logical replication; may not be
-     *                                  null
-     * @param tableFilter               the tables to watch of the DB publication for logical replication; may not
-     *                                  be null
+     * @param config the JDBC configuration for the connection; may not be null
+     * @param slotName the name of the DB slot for logical replication; may not be null
+     * @param publicationName the name of the DB publication for logical replication; may not be
+     *     null
+     * @param tableFilter the tables to watch of the DB publication for logical replication; may not
+     *     be null
      * @param publicationAutocreateMode the mode for publication autocreation; may not be null
-     * @param plugin                    decoder matching the server side plug-in used for streaming changes; may not be
-     *                                  null
-     * @param dropSlotOnClose           whether the replication slot should be dropped once the connection is
-     *                                  closed
-     * @param statusUpdateInterval      the interval at which the replication connection should
-     *                                  periodically send status
-     * @param doSnapshot                whether the connector is doing snapshot
-     * @param jdbcConnection            general PostgreSQL JDBC connection
-     * @param typeRegistry              registry with PostgreSQL types
-     * @param streamParams              additional parameters to pass to the replication stream
-     * @param schema                    the schema; must not be null
-     *                                  <p>updates to the server
+     * @param plugin decoder matching the server side plug-in used for streaming changes; may not be
+     *     null
+     * @param dropSlotOnClose whether the replication slot should be dropped once the connection is
+     *     closed
+     * @param statusUpdateInterval the interval at which the replication connection should
+     *     periodically send status
+     * @param doSnapshot whether the connector is doing snapshot
+     * @param jdbcConnection general PostgreSQL JDBC connection
+     * @param typeRegistry registry with PostgreSQL types
+     * @param streamParams additional parameters to pass to the replication stream
+     * @param schema the schema; must not be null
+     *     <p>updates to the server
      */
     private PostgresReplicationConnection(
             PostgresConnectorConfig config,
@@ -160,8 +160,8 @@ public class PostgresReplicationConnection extends JdbcConnection implements Rep
 
     private ServerInfo.ReplicationSlot getSlotInfo() throws SQLException, InterruptedException {
         try (PostgresConnection connection =
-                     new PostgresConnection(
-                             connectorConfig.getJdbcConfig(), PostgresConnection.CONNECTION_SLOT_INFO)) {
+                new PostgresConnection(
+                        connectorConfig.getJdbcConfig(), PostgresConnection.CONNECTION_SLOT_INFO)) {
             return connection.readReplicationSlotInfo(slotName, plugin.getPostgresPluginName());
         }
     }
@@ -181,7 +181,7 @@ public class PostgresReplicationConnection extends JdbcConnection implements Rep
                                 "SELECT COUNT(1) FROM pg_publication WHERE pubname = '%s'",
                                 publicationName);
                 try (Statement stmt = conn.createStatement();
-                     ResultSet rs = stmt.executeQuery(selectPublication)) {
+                        ResultSet rs = stmt.executeQuery(selectPublication)) {
                     if (rs.next()) {
                         Long count = rs.getLong(1);
                         // Close eagerly as the transaction might stay running
@@ -253,11 +253,11 @@ public class PostgresReplicationConnection extends JdbcConnection implements Rep
             createOrUpdatePublicationStmt =
                     isUpdate
                             ? String.format(
-                            "ALTER PUBLICATION %s SET TABLE %s;",
-                            publicationName, tableFilterString)
+                                    "ALTER PUBLICATION %s SET TABLE %s;",
+                                    publicationName, tableFilterString)
                             : String.format(
-                            "CREATE PUBLICATION %s FOR TABLE %s;",
-                            publicationName, tableFilterString);
+                                    "CREATE PUBLICATION %s FOR TABLE %s;",
+                                    publicationName, tableFilterString);
             LOGGER.info(
                     isUpdate
                             ? "Updating Publication with statement '{}'"
@@ -428,6 +428,7 @@ public class PostgresReplicationConnection extends JdbcConnection implements Rep
 
     /**
      * baisui note
+     *
      * @return
      * @throws SQLException
      */
@@ -461,11 +462,11 @@ public class PostgresReplicationConnection extends JdbcConnection implements Rep
                             "CREATE_REPLICATION_SLOT \"%s\" %s LOGICAL %s",
                             slotName, tempPart, plugin.getPostgresPluginName());
 
-//            String createCommand = String.format(
-//                    "SELECT * FROM pg_create_logical_replication_slot('%s', '%s')",
-//                    slotName,
-//                    // tempPart,
-//                    plugin.getPostgresPluginName());
+            //            String createCommand = String.format(
+            //                    "SELECT * FROM pg_create_logical_replication_slot('%s', '%s')",
+            //                    slotName,
+            //                    // tempPart,
+            //                    plugin.getPostgresPluginName());
 
             LOGGER.info("Creating replication slot with command {}", createCommand);
             stmt.execute(createCommand);
@@ -488,7 +489,7 @@ public class PostgresReplicationConnection extends JdbcConnection implements Rep
             if (rs.next()) {
                 String slotName = rs.getString("slot_name");
                 String startPoint = rs.getString("consistent_point");
-               // String startPoint = rs.getString("lsn");
+                // String startPoint = rs.getString("lsn");
                 String snapName = rs.getString("snapshot_name");
                 String pluginName = rs.getString("output_plugin");
 
@@ -693,8 +694,8 @@ public class PostgresReplicationConnection extends JdbcConnection implements Rep
                 if (--warningCheckCounter == 0 || forced) {
                     warningCheckCounter = CHECK_WARNINGS_AFTER_COUNT;
                     for (SQLWarning w = connection().getWarnings();
-                         w != null;
-                         w = w.getNextWarning()) {
+                            w != null;
+                            w = w.getNextWarning()) {
                         LOGGER.debug(
                                 "Server-side message: '{}', state = {}, code = {}",
                                 w.getMessage(),
@@ -728,9 +729,9 @@ public class PostgresReplicationConnection extends JdbcConnection implements Rep
     private KBReplicationStream startKBReplicationStream(
             final Lsn lsn,
             BiFunction<
-                    ChainedLogicalStreamBuilder,
-                    Function<Integer, Boolean>,
-                    ChainedLogicalStreamBuilder>
+                            ChainedLogicalStreamBuilder,
+                            Function<Integer, Boolean>,
+                            ChainedLogicalStreamBuilder>
                     configurator)
             throws SQLException {
         assert lsn != null;
@@ -792,9 +793,9 @@ public class PostgresReplicationConnection extends JdbcConnection implements Rep
             // we're dropping the replication slot via a regular - i.e. not a replication -
             // connection
             try (PostgresConnection connection =
-                         new PostgresConnection(
-                                 connectorConfig.getJdbcConfig(),
-                                 PostgresConnection.CONNECTION_DROP_SLOT)) {
+                    new PostgresConnection(
+                            connectorConfig.getJdbcConfig(),
+                            PostgresConnection.CONNECTION_DROP_SLOT)) {
                 connection.dropReplicationSlot(slotName);
             } catch (Throwable e) {
                 LOGGER.error("Unexpected error while dropping replication slot", e);

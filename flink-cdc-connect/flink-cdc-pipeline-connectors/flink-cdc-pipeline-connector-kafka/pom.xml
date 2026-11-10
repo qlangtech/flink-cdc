@@ -57,7 +57,7 @@ limitations under the License.
         <!-- Test dependencies -->
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-cdc-composer</artifactId>
+            <artifactId>flink-cdc-composer-tis</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>

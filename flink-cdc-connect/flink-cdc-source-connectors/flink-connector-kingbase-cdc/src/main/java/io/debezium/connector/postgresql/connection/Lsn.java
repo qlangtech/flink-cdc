@@ -13,8 +13,8 @@ import java.nio.ByteBuffer;
 /**
  * baisui: has been replaced to the debezium source code
  *
- * Copied from Debezium 1.9.8.final without changes due to the NoSuchMethodError, caused by the fact
- * that current Debezium release java version is 11, so we need to compile this file by java 8
+ * <p>Copied from Debezium 1.9.8.final without changes due to the NoSuchMethodError, caused by the
+ * fact that current Debezium release java version is 11, so we need to compile this file by java 8
  * compiler. <a
  * href="https://www.morling.dev/blog/bytebuffer-and-the-dreaded-nosuchmethoderror/">More info</a>.
  * Abstraction of PostgreSQL log sequence number, adapted from {@link LogSequenceNumber}.
@@ -93,12 +93,16 @@ public class Lsn implements Comparable<Lsn> {
         return Lsn.valueOf(value);
     }
 
-    /** @return Long represent position in the write-ahead log stream */
+    /**
+     * @return Long represent position in the write-ahead log stream
+     */
     public long asLong() {
         return value;
     }
 
-    /** @return PostgreSQL JDBC driver representation of position in the write-ahead log stream */
+    /**
+     * @return PostgreSQL JDBC driver representation of position in the write-ahead log stream
+     */
     public LogSequenceNumber asLogSequenceNumber() {
         return LogSequenceNumber.valueOf(value);
     }

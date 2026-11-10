@@ -67,7 +67,8 @@ public class PostgresSourceConfig extends JdbcSourceConfig {
             boolean skipSnapshotBackfill,
             boolean isScanNewlyAddedTableEnabled,
             int lsnCommitCheckpointsDelay,
-            boolean assignUnboundedChunkFirst) {
+            boolean assignUnboundedChunkFirst,
+            boolean releaseSnapshotMetadataEnabled) {
         super(
                 startupOptions,
                 databaseList,
@@ -94,7 +95,8 @@ public class PostgresSourceConfig extends JdbcSourceConfig {
                 chunkKeyColumn,
                 skipSnapshotBackfill,
                 isScanNewlyAddedTableEnabled,
-                assignUnboundedChunkFirst);
+                assignUnboundedChunkFirst,
+                releaseSnapshotMetadataEnabled);
         this.subtaskId = subtaskId;
         this.lsnCommitCheckpointsDelay = lsnCommitCheckpointsDelay;
     }

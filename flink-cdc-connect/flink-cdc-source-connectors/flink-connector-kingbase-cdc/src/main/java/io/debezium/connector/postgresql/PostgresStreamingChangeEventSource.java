@@ -5,6 +5,7 @@
  */
 package io.debezium.connector.postgresql;
 
+import com.kingbase8.core.BaseConnection;
 import io.debezium.DebeziumException;
 import io.debezium.connector.postgresql.connection.LogicalDecodingMessage;
 import io.debezium.connector.postgresql.connection.Lsn;
@@ -24,7 +25,6 @@ import io.debezium.util.DelayStrategy;
 import io.debezium.util.ElapsedTimeStrategy;
 import io.debezium.util.Threads;
 import org.apache.kafka.connect.errors.ConnectException;
-import com.kingbase8.core.BaseConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

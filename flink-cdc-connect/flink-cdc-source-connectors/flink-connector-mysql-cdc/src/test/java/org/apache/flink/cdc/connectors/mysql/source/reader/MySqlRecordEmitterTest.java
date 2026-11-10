@@ -25,8 +25,8 @@ import org.apache.flink.cdc.connectors.mysql.source.split.MySqlBinlogSplitState;
 import org.apache.flink.cdc.connectors.mysql.source.split.SourceRecords;
 import org.apache.flink.cdc.connectors.mysql.source.utils.RecordUtils;
 import org.apache.flink.cdc.debezium.DebeziumDeserializationSchema;
+import org.apache.flink.connector.testutils.source.reader.TestingReaderContext;
 import org.apache.flink.connector.testutils.source.reader.TestingReaderOutput;
-import org.apache.flink.runtime.metrics.groups.UnregisteredMetricGroups;
 import org.apache.flink.util.Collector;
 
 import io.debezium.config.Configuration;
@@ -107,8 +107,7 @@ class MySqlRecordEmitterTest {
                         return TypeInformation.of(Void.class);
                     }
                 },
-                new SourceReaderMetrics(
-                        UnregisteredMetricGroups.createUnregisteredSourceReaderMetricGroup()),
+                new SourceReaderMetrics(new TestingReaderContext().metricGroup()),
                 false,
                 false,
                 false);
@@ -371,8 +370,7 @@ class MySqlRecordEmitterTest {
                         return TypeInformation.of(String.class);
                     }
                 },
-                new SourceReaderMetrics(
-                        UnregisteredMetricGroups.createUnregisteredSourceReaderMetricGroup()),
+                new SourceReaderMetrics(new TestingReaderContext().metricGroup()),
                 false,
                 false,
                 includeTransactionMetadataEvents);

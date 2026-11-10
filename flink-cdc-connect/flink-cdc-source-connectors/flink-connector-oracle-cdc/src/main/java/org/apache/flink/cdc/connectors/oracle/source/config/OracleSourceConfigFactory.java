@@ -139,7 +139,7 @@ public class OracleSourceConfigFactory extends JdbcSourceConfigFactory {
                 releaseSnapshotMetadataEnabled);
     }
 
-    protected  Class<?> getConnectorClass() {
+    protected Class<?> getConnectorClass() {
         return OracleConnector.class;
     }
 }

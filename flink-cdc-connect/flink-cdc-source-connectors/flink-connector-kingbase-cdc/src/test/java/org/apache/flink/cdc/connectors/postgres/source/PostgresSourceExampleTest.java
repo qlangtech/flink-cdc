@@ -43,6 +43,8 @@ import io.debezium.connector.postgresql.spi.SlotState;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -57,6 +59,8 @@ import static org.testcontainers.containers.PostgreSQLContainer.POSTGRESQL_PORT;
 
 /** Tests for Postgres Source based on incremental snapshot framework . */
 public class PostgresSourceExampleTest extends PostgresTestBase {
+
+    private static final Logger LOG = LoggerFactory.getLogger(PostgresSourceExampleTest.class);
 
     private static final String DB_NAME_PREFIX = "postgres";
     private static final String SCHEMA_NAME = "inventory";
@@ -108,7 +112,6 @@ public class PostgresSourceExampleTest extends PostgresTestBase {
                         .slotName(SLOT_NAME)
                         .decodingPluginName(PLUGIN_NAME)
                         .deserializer(deserializer)
-                        .includeSchemaChanges(true) // output the schema changes as well
                         .splitSize(2)
                         .build();
 
@@ -153,7 +156,6 @@ public class PostgresSourceExampleTest extends PostgresTestBase {
                         .slotName(SLOT_NAME)
                         .decodingPluginName(PLUGIN_NAME)
                         .deserializer(buildRowDataDebeziumDeserializeSchema(dataType))
-                        .includeSchemaChanges(true) // output the schema changes as well
                         .splitSize(2)
                         .debeziumProperties(debeziumProps)
                         .build();
@@ -192,7 +194,7 @@ public class PostgresSourceExampleTest extends PostgresTestBase {
         List<String> snapshotActualRecords = formatResult(snapshotRowDataList, dataType);
         assertEqualsInAnyOrder(Arrays.asList(snapshotExpectedRecords), snapshotActualRecords);
 
-        log.info("All snapshot data consumed!");
+        LOG.info("All snapshot data consumed!");
 
         // step-2: make 6 change events in one PostgreSQL transaction
         makeWalEvents(getConnection(), TABLE_ID);
@@ -211,14 +213,14 @@ public class PostgresSourceExampleTest extends PostgresTestBase {
         List<RowData> walRowDataList = new ArrayList<>();
         for (int i = 0; i < walExpectedRecords.length && iterator.hasNext(); i++) {
             RowData rowData = iterator.next();
-            log.info("step 3: consume wal event: {}", rowData);
+            LOG.info("step 3: consume wal event: {}", rowData);
             walRowDataList.add(rowData);
         }
 
         List<String> walActualRecords = formatResult(walRowDataList, dataType);
         assertEqualsInAnyOrder(Arrays.asList(walExpectedRecords), walActualRecords);
 
-        log.info("All streaming events consumed!");
+        LOG.info("All streaming events consumed!");
 
         // stop the worker
         iterator.close();
@@ -281,7 +283,7 @@ public class PostgresSourceExampleTest extends PostgresTestBase {
         SlotState slotState = connection.getReplicationSlotState(SLOT_NAME, PLUGIN_NAME);
 
         while (slotState == null) {
-            log.info("Waiting until the replication slot is ready ...");
+            LOG.info("Waiting until the replication slot is ready ...");
             try {
                 Thread.sleep(2000L);
             } catch (InterruptedException e) {

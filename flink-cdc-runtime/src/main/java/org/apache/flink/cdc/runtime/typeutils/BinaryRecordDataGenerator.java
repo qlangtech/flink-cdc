@@ -31,9 +31,7 @@ import java.util.Arrays;
 
 import static org.apache.flink.cdc.common.utils.Preconditions.checkArgument;
 
-/**
- * This class is used to create {@link BinaryRecordData}.
- */
+/** This class is used to create {@link BinaryRecordData}. */
 @PublicEvolving
 public class BinaryRecordDataGenerator {
 
@@ -90,7 +88,8 @@ public class BinaryRecordDataGenerator {
                     BinaryWriter.write(reuseWriter, i, rowFields[i], dataTypes[i], serializers[i]);
                 } catch (Exception e) {
                     // baisui add for error debug detaild info
-                    throw new RuntimeException("index:" + i + ",dataType:" + dataTypes[i] + ",val:" + rowFields[i], e);
+                    throw new RuntimeException(
+                            "index:" + i + ",dataType:" + dataTypes[i] + ",val:" + rowFields[i], e);
                 }
             }
         }

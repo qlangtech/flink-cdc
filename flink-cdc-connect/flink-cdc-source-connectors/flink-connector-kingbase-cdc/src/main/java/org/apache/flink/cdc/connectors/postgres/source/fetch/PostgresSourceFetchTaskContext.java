@@ -112,7 +112,7 @@ public class PostgresSourceFetchTaskContext extends JdbcSourceFetchTaskContext {
         Offset offset =
                 sourceSplitBase.isSnapshotSplit()
                         ? new PostgresOffsetFactory()
-                        .createInitialOffset() // get an offset for starting snapshot
+                                .createInitialOffset() // get an offset for starting snapshot
                         : sourceSplitBase.asStreamSplit().getStartingOffset();
 
         return PostgresOffsetUtils.getPostgresOffsetContext(loader, offset);
@@ -349,7 +349,7 @@ public class PostgresSourceFetchTaskContext extends JdbcSourceFetchTaskContext {
     }
 
     public SnapshotChangeEventSourceMetrics<PostgresPartition>
-    getSnapshotChangeEventSourceMetrics() {
+            getSnapshotChangeEventSourceMetrics() {
         return snapshotChangeEventSourceMetrics;
     }
 

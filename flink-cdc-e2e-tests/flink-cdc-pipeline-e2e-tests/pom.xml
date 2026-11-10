@@ -83,7 +83,7 @@ limitations under the License.
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-connector-mysql-cdc</artifactId>
+            <artifactId>flink-connector-mysql-cdc-tis</artifactId>
             <version>${project.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
@@ -120,7 +120,7 @@ limitations under the License.
 
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-connector-oracle-cdc</artifactId>
+            <artifactId>flink-connector-oracle-cdc-tis</artifactId>
             <version>${parent.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
@@ -142,7 +142,7 @@ limitations under the License.
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-cdc-pipeline-connector-paimon</artifactId>
+            <artifactId>flink-cdc-pipeline-connector-paimon-tis</artifactId>
             <version>${project.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
@@ -169,7 +169,7 @@ limitations under the License.
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-cdc-pipeline-connector-kafka</artifactId>
+            <artifactId>flink-cdc-pipeline-connector-kafka-tis</artifactId>
             <version>${project.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
@@ -666,7 +666,7 @@ limitations under the License.
 
                         <artifactItem>
                             <groupId>org.apache.flink</groupId>
-                            <artifactId>flink-cdc-pipeline-connector-kafka</artifactId>
+                            <artifactId>flink-cdc-pipeline-connector-kafka-tis</artifactId>
                             <version>${project.version}</version>
                             <destFileName>kafka-cdc-pipeline-connector.jar</destFileName>
                             <type>jar</type>
@@ -705,7 +705,7 @@ limitations under the License.
                         </artifactItem>
                         <artifactItem>
                             <groupId>org.apache.flink</groupId>
-                            <artifactId>flink-cdc-pipeline-connector-paimon</artifactId>
+                            <artifactId>flink-cdc-pipeline-connector-paimon-tis</artifactId>
                             <version>${project.version}</version>
                             <destFileName>paimon-cdc-pipeline-connector.jar</destFileName>
                             <type>jar</type>

@@ -301,16 +301,16 @@ public class PostgresScanFetchTask extends AbstractScanFetchTask {
                     selectSql);
 
             try (PreparedStatement selectStatement =
-                         PostgresQueryUtils.readTableSplitDataStatement(
-                                 jdbcConnection,
-                                 selectSql,
-                                 snapshotSplit.getSplitStart() == null,
-                                 snapshotSplit.getSplitEnd() == null,
-                                 snapshotSplit.getSplitStart(),
-                                 snapshotSplit.getSplitEnd(),
-                                 snapshotSplit.getSplitKeyType().getFieldCount(),
-                                 connectorConfig.getSnapshotFetchSize());
-                 ResultSet rs = selectStatement.executeQuery()) {
+                            PostgresQueryUtils.readTableSplitDataStatement(
+                                    jdbcConnection,
+                                    selectSql,
+                                    snapshotSplit.getSplitStart() == null,
+                                    snapshotSplit.getSplitEnd() == null,
+                                    snapshotSplit.getSplitStart(),
+                                    snapshotSplit.getSplitEnd(),
+                                    snapshotSplit.getSplitKeyType().getFieldCount(),
+                                    connectorConfig.getSnapshotFetchSize());
+                    ResultSet rs = selectStatement.executeQuery()) {
 
                 ColumnUtils.ColumnArray columnArray = ColumnUtils.toArray(rs, table);
                 long rows = 0;
@@ -368,7 +368,7 @@ public class PostgresScanFetchTask extends AbstractScanFetchTask {
 
         private static class PostgresSnapshotContext
                 extends RelationalSnapshotChangeEventSource.RelationalSnapshotContext<
-                PostgresPartition, PostgresOffsetContext> {
+                        PostgresPartition, PostgresOffsetContext> {
 
             public PostgresSnapshotContext(PostgresPartition partition) throws SQLException {
                 super(partition, "");

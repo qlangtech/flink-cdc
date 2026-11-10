@@ -23,9 +23,7 @@ import org.apache.flink.table.types.logical.DecimalType;
 
 import io.debezium.relational.Column;
 
-/**
- * A utility class for converting Postgres types to Flink types.
- */
+/** A utility class for converting Postgres types to Flink types. */
 public class PostgresTypeUtils {
     private static final String PG_SMALLSERIAL = "smallserial";
     private static final String PG_SERIAL = "serial";
@@ -63,9 +61,7 @@ public class PostgresTypeUtils {
     private static final String PG_CHARACTER_VARYING = "varchar";
     private static final String PG_CHARACTER_VARYING_ARRAY = "_varchar";
 
-    /**
-     * Returns a corresponding Flink data type from a debezium {@link Column}.
-     */
+    /** Returns a corresponding Flink data type from a debezium {@link Column}. */
     public static DataType fromDbzColumn(Column column) {
         DataType dataType = convertFromColumn(column);
         if (column.isOptional()) {

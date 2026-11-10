@@ -241,7 +241,8 @@ public class BinlogOffset implements Comparable<BinlogOffset>, Serializable {
             }
         }
 
-        // fix for issue:https://github.com/datavane/tis/issues/477 flink-cdc启动如mysql 数据库的binlog没有开启 gtid功能 就会报异常
+        // fix for issue:https://github.com/datavane/tis/issues/477 flink-cdc启动如mysql 数据库的binlog没有开启
+        // gtid功能 就会报异常
         // First compare the MySQL binlog filenames
         // Handle null filenames gracefully (e.g., for LATEST/TIMESTAMP offsets)
         String thisFilename = this.getFilename();

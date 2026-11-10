@@ -59,9 +59,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
-/**
- * Composer for translating data pipeline to a Flink DataStream job.
- */
+/** Composer for translating data pipeline to a Flink DataStream job. */
 @Internal
 public class FlinkPipelineComposer implements PipelineComposer {
 
@@ -163,8 +161,13 @@ public class FlinkPipelineComposer implements PipelineComposer {
         translate(env, dataSource, dataSink, sinkTranslator, stream, pipelineDef);
     }
 
-    public void translate(StreamExecutionEnvironment env, DataSource dataSource
-            , DataSink dataSink, DataSinkTranslator sinkTranslator, DataStream<Event> stream, PipelineDef pipelineDef) {
+    public void translate(
+            StreamExecutionEnvironment env,
+            DataSource dataSource,
+            DataSink dataSink,
+            DataSinkTranslator sinkTranslator,
+            DataStream<Event> stream,
+            PipelineDef pipelineDef) {
         Configuration pipelineDefConfig = pipelineDef.getConfig();
         int parallelism = pipelineDefConfig.get(PipelineOptions.PIPELINE_PARALLELISM);
         SchemaChangeBehavior schemaChangeBehavior =
@@ -203,7 +206,6 @@ public class FlinkPipelineComposer implements PipelineComposer {
                         schemaOperatorUid,
                         pipelineDefConfig.get(PipelineOptions.PIPELINE_SCHEMA_OPERATOR_RPC_TIMEOUT),
                         pipelineDefConfig.get(PipelineOptions.PIPELINE_LOCAL_TIME_ZONE));
-
 
         // And required constructors
         OperatorIDGenerator schemaOperatorIDGenerator = new OperatorIDGenerator(schemaOperatorUid);

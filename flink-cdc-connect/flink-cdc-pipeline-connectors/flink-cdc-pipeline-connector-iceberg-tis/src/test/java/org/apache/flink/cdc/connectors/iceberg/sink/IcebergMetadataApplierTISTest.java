@@ -19,7 +19,6 @@ package org.apache.flink.cdc.connectors.iceberg.sink;
 
 import org.apache.flink.cdc.common.event.CreateTableEvent;
 import org.apache.flink.cdc.common.event.TableId;
-import org.apache.flink.cdc.common.schema.PhysicalColumn;
 import org.apache.flink.cdc.common.schema.Schema;
 import org.apache.flink.cdc.common.types.DataTypes;
 
@@ -44,7 +43,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
- * TIS 定制部分的回归测试。
+ * TIS 定制部分的回归测试.
  *
  * <p>这三处行为与上游 flink-cdc Iceberg 连接器不同，且都被 TIS 的增量链路依赖，改动时必须能被这里拦下：
  *
@@ -77,7 +76,7 @@ public class IcebergMetadataApplierTISTest {
                 .build();
     }
 
-    /** TIS 的时间分区编码必须被翻译成 Iceberg 的 transform，而不是当作 identity 列名 */
+    /** TIS 的时间分区编码必须被翻译成 Iceberg 的 transform，而不是当作 identity 列名. */
     @Test
     public void testCreateTableWithTransformPartition() {
         Map<String, String> catalogOptions = catalogOptions();
@@ -102,7 +101,7 @@ public class IcebergMetadataApplierTISTest {
                 .isEqualTo("create_time");
     }
 
-    /** 不带冒号的旧形式仍按 identity 处理，避免破坏上游行为 */
+    /** 不带冒号的旧形式仍按 identity 处理，避免破坏上游行为. */
     @Test
     public void testCreateTableWithIdentityPartition() {
         Map<String, String> catalogOptions = catalogOptions();
@@ -118,13 +117,12 @@ public class IcebergMetadataApplierTISTest {
                 new IcebergMetadataApplier(catalogOptions, new HashMap<>(), partitionMaps);
         applier.applySchemaChange(new CreateTableEvent(tableId, schema()));
 
-        PartitionSpec spec =
-                catalog.loadTable(TableIdentifier.parse(tableId.identifier())).spec();
+        PartitionSpec spec = catalog.loadTable(TableIdentifier.parse(tableId.identifier())).spec();
         assertThat(spec.fields()).hasSize(1);
         assertThat(spec.fields().get(0).transform().toString()).isEqualTo("identity");
     }
 
-    /** 非法 transform 必须尽早失败，而不是静默退化成 identity */
+    /** 非法 transform 必须尽早失败，而不是静默退化成 identity. */
     @Test
     public void testIllegalTransformPartition() {
         Map<String, String> catalogOptions = catalogOptions();
@@ -139,11 +137,10 @@ public class IcebergMetadataApplierTISTest {
     }
 
     /**
-     * Schema 携带的 options 必须落到建表属性上。
+     * Schema 携带的 options 必须落到建表属性上.
      *
-     * <p>TIS 侧的 writer 把文件格式、压缩编码与目标文件大小都放在 {@code createTabOpts()} 里，
-     * 由 SchemaEmitterFunction 注入 Schema.options；上游连接器不读它，这些配置就会静默失效，
-     * 表退化成连接器内置的 parquet 默认值。
+     * <p>TIS 侧的 writer 把文件格式、压缩编码与目标文件大小都放在 {@code createTabOpts()} 里， 由 SchemaEmitterFunction 注入
+     * Schema.options；上游连接器不读它，这些配置就会静默失效， 表退化成连接器内置的 parquet 默认值。
      */
     @Test
     public void testCreateTableAppliesSchemaOptions() {
@@ -171,7 +168,7 @@ public class IcebergMetadataApplierTISTest {
                 .containsEntry(TableProperties.WRITE_TARGET_FILE_SIZE_BYTES, "536870912");
     }
 
-    /** sink 级 tableOptions 打底、Schema.options 覆盖：同名键以 Schema 为准 */
+    /** sink 级 tableOptions 打底、Schema.options 覆盖：同名键以 Schema 为准. */
     @Test
     public void testSchemaOptionsOverrideSinkTableOptions() {
         Map<String, String> catalogOptions = catalogOptions();
@@ -202,7 +199,7 @@ public class IcebergMetadataApplierTISTest {
                 .containsEntry(TableProperties.PARQUET_COMPRESSION, "gzip");
     }
 
-    /** 仅当表不存在时建表，重复的 CreateTableEvent 不能覆盖已有表结构 */
+    /** 仅当表不存在时建表，重复的 CreateTableEvent 不能覆盖已有表结构. */
     @Test
     public void testCreateTableIsIdempotent() {
         Map<String, String> catalogOptions = catalogOptions();

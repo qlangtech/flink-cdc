@@ -130,7 +130,7 @@ public class MySqlRecordEmitter<T> implements RecordEmitter<SourceRecords, T, My
     }
 
     private void emitElement(SourceRecord element, SourceOutput<T> output) throws Exception {
-// baisui add for metrics 2025/07/04
+        // baisui add for metrics 2025/07/04
         sourceReaderMetrics.markRecord();
         sourceReaderMetrics.updateRecordCounters(element);
 

@@ -30,7 +30,7 @@ limitations under the License.
     <dependencies>
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-connector-oracle-cdc</artifactId>
+            <artifactId>flink-connector-oracle-cdc-tis</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>
