@@ -28,6 +28,7 @@ import org.apache.flink.connector.base.source.reader.RecordEmitter;
 import javax.annotation.Nullable;
 
 import java.time.Duration;
+import java.util.Objects;
 import java.util.Properties;
 
 import static org.apache.flink.util.Preconditions.checkNotNull;
@@ -41,24 +42,33 @@ import static org.apache.flink.util.Preconditions.checkNotNull;
  */
 @Internal
 public class OracleSourceBuilder<T> {
-    private final OracleSourceConfigFactory configFactory = new OracleSourceConfigFactory();
+    private final OracleSourceConfigFactory configFactory;
     private RedoLogOffsetFactory offsetFactory;
-    private OracleDialect dialect;
+    private final OracleDialect dialect;
     private DebeziumDeserializationSchema<T> deserializer;
     private static RecordEmitter recordEmitter;
+
+    public OracleSourceBuilder(OracleSourceConfigFactory configFactory, OracleDialect dialect) {
+        this.configFactory = configFactory;
+        this.dialect = dialect;
+    }
 
     public OracleSourceBuilder<T> hostname(String hostname) {
         this.configFactory.hostname(hostname);
         return this;
     }
 
-    /** Url to use when connecting to the Oracle database server. */
+    /**
+     * Url to use when connecting to the Oracle database server.
+     */
     public OracleSourceBuilder<T> url(@Nullable String url) {
         this.configFactory.url(url);
         return this;
     }
 
-    /** Integer port number of the Oracle database server. */
+    /**
+     * Integer port number of the Oracle database server.
+     */
     public OracleSourceBuilder<T> port(int port) {
         this.configFactory.port(port);
         return this;
@@ -93,13 +103,17 @@ public class OracleSourceBuilder<T> {
         return this;
     }
 
-    /** Name of the Oracle database to use when connecting to the Oracle database server. */
+    /**
+     * Name of the Oracle database to use when connecting to the Oracle database server.
+     */
     public OracleSourceBuilder<T> username(String username) {
         this.configFactory.username(username);
         return this;
     }
 
-    /** Password to use when connecting to the Oracle database server. */
+    /**
+     * Password to use when connecting to the Oracle database server.
+     */
     public OracleSourceBuilder<T> password(String password) {
         this.configFactory.password(password);
         return this;
@@ -151,7 +165,9 @@ public class OracleSourceBuilder<T> {
         return this;
     }
 
-    /** The maximum fetch size for per poll when read table snapshot. */
+    /**
+     * The maximum fetch size for per poll when read table snapshot.
+     */
     public OracleSourceBuilder<T> fetchSize(int fetchSize) {
         this.configFactory.fetchSize(fetchSize);
         return this;
@@ -166,25 +182,33 @@ public class OracleSourceBuilder<T> {
         return this;
     }
 
-    /** The max retry times to get connection. */
+    /**
+     * The max retry times to get connection.
+     */
     public OracleSourceBuilder<T> connectMaxRetries(int connectMaxRetries) {
         this.configFactory.connectMaxRetries(connectMaxRetries);
         return this;
     }
 
-    /** The connection pool size. */
+    /**
+     * The connection pool size.
+     */
     public OracleSourceBuilder<T> connectionPoolSize(int connectionPoolSize) {
         this.configFactory.connectionPoolSize(connectionPoolSize);
         return this;
     }
 
-    /** Whether the {@link OracleIncrementalSource} should output the schema changes or not. */
+    /**
+     * Whether the {@link OracleIncrementalSource} should output the schema changes or not.
+     */
     public OracleSourceBuilder<T> includeSchemaChanges(boolean includeSchemaChanges) {
         this.configFactory.includeSchemaChanges(includeSchemaChanges);
         return this;
     }
 
-    /** Specifies the startup options. */
+    /**
+     * Specifies the startup options.
+     */
     public OracleSourceBuilder<T> startupOptions(StartupOptions startupOptions) {
         this.configFactory.startupOptions(startupOptions);
         return this;
@@ -199,7 +223,9 @@ public class OracleSourceBuilder<T> {
         return this;
     }
 
-    /** The Debezium Oracle connector properties. For example, "snapshot.mode". */
+    /**
+     * The Debezium Oracle connector properties. For example, "snapshot.mode".
+     */
     public OracleSourceBuilder<T> debeziumProperties(Properties properties) {
         this.configFactory.debeziumProperties(properties);
         return this;
@@ -245,7 +271,9 @@ public class OracleSourceBuilder<T> {
         return this;
     }
 
-    /** Whether the {@link OracleIncrementalSource} should scan the newly added tables or not. */
+    /**
+     * Whether the {@link OracleIncrementalSource} should scan the newly added tables or not.
+     */
     public OracleSourceBuilder<T> scanNewlyAddedTableEnabled(boolean scanNewlyAddedTableEnabled) {
         this.configFactory.scanNewlyAddedTableEnabled(scanNewlyAddedTableEnabled);
         return this;
@@ -277,24 +305,30 @@ public class OracleSourceBuilder<T> {
      */
     public OracleIncrementalSource<T> build() {
         this.offsetFactory = new RedoLogOffsetFactory();
-        this.dialect = new OracleDialect();
-        return new OracleIncrementalSource<T>(
-                configFactory, checkNotNull(deserializer), offsetFactory, dialect);
+        //  this.dialect = new OracleDialect();
+
+        return new OracleIncrementalSource<T>(configFactory, checkNotNull(deserializer), offsetFactory,
+                Objects.requireNonNull(dialect, "dialect can not be null"));
     }
 
-    /** The {@link JdbcIncrementalSource} implementation for Oracle. */
+    /**
+     * The {@link JdbcIncrementalSource} implementation for Oracle.
+     */
     public static class OracleIncrementalSource<T> extends JdbcIncrementalSource<T> {
 
-        public OracleIncrementalSource(
-                OracleSourceConfigFactory configFactory,
-                DebeziumDeserializationSchema<T> deserializationSchema,
-                RedoLogOffsetFactory offsetFactory,
-                OracleDialect dataSourceDialect) {
+        public OracleIncrementalSource(OracleSourceConfigFactory configFactory,
+                                       DebeziumDeserializationSchema<T> deserializationSchema,
+                                       RedoLogOffsetFactory offsetFactory, OracleDialect dataSourceDialect) {
             super(configFactory, deserializationSchema, offsetFactory, dataSourceDialect);
         }
 
         public static <T> OracleSourceBuilder<T> builder() {
-            return new OracleSourceBuilder<>();
+            return builder(new OracleSourceConfigFactory(), new OracleDialect());
+        }
+
+        public static <T> OracleSourceBuilder<T> builder(OracleSourceConfigFactory configFactory,
+                                                         OracleDialect dialect) {
+            return new OracleSourceBuilder<>(configFactory, dialect);
         }
     }
 }

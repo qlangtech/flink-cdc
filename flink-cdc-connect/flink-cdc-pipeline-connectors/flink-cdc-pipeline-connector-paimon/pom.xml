@@ -26,7 +26,8 @@ limitations under the License.
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>flink-cdc-pipeline-connector-paimon</artifactId>
+    <artifactId>flink-cdc-pipeline-connector-paimon-tis</artifactId>
+
 
     <properties>
         <paimon.version>2.0.0</paimon.version>
@@ -193,6 +194,7 @@ limitations under the License.
             <groupId>org.apache.hive</groupId>
             <artifactId>hive-metastore</artifactId>
             <version>${hive.version}</version>
+            <scope>provided</scope>
             <exclusions>
                 <exclusion>
                     <groupId>log4j</groupId>
@@ -319,6 +321,32 @@ limitations under the License.
                                     <include>org.apache.paimon:*</include>
                                 </includes>
                             </artifactSet>
+                            <filters>
+                                <!--baisui add for error as below 2025/06/09 -->
+<!--
+Caused by: java.lang.LinkageError: loader constraint violation: when resolving method "com.qlangtech.tis.plugin.paimon.datax.DataxPaimonWriter.initializeSchemaBuilder(Lorg/apache/paimon/schema/Schema$Builder;)V" the class loader com.qlangtech.tis.extension.impl.PluginFirstClassLoader @238e786f (instance of com.qlangtech.tis.extension.impl.PluginFirstClassLoader, child of 'app' jdk.internal.loader.ClassLoaders$AppClassLoader) of the current class, com/qlangtech/tis/plugins/incr/flink/connector/PipelineEventSinkFunc, and the class loader com.qlangtech.tis.extension.impl.PluginFirstClassLoader @b2badba (instance of com.qlangtech.tis.extension.impl.PluginFirstClassLoader, child of 'app' jdk.internal.loader.ClassLoaders$AppClassLoader) for the method's defining class, com/qlangtech/tis/plugin/paimon/datax/DataxPaimonWriter, have different Class objects for the type org/apache/paimon/schema/Schema$Builder used in the signature
+at com.qlangtech.tis.plugins.incr.flink.connector.PipelineEventSinkFunc.createTabOpts(PipelineEventSinkFunc.java:266)
+-->
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <!--because need to reserve org/apache/paimon/flink/**-->
+<!--                                    <excludes>-->
+<!--                                        <exclude>org/apache/paimon/schema/**</exclude>-->
+<!--                                        <exclude>org/apache/paimon/options/**</exclude>-->
+<!--                                        <exclude>org/apache/paimon/factories/**</exclude>-->
+<!--                                        <exclude>org/apache/paimon/catalog/**</exclude>-->
+<!--                                        <exclude>org/apache/paimon/data/**</exclude>-->
+<!--                                        <exclude>org/apache/paimon/table/**</exclude>-->
+<!--                                        <exclude>org/apache/paimon/hive/**</exclude>-->
+<!--                                        <exclude>org/apache/paimon/types/**</exclude>-->
+<!--                                        <exclude>org/apache/paimon/fs/**</exclude>-->
+<!--                                    </excludes>-->
+                                    <includes>
+                                        <include>org/apache/paimon/flink/**</include>
+                                        <include>org/apache/flink/cdc/**</include>
+                                    </includes>
+                                </filter>
+                            </filters>
                             <relocations>
                                 <relocation>
                                     <pattern>org.apache.kafka</pattern>

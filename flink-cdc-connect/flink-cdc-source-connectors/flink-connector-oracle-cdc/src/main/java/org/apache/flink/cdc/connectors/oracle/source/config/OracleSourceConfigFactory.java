@@ -63,7 +63,7 @@ public class OracleSourceConfigFactory extends JdbcSourceConfigFactory {
     public OracleSourceConfig create(int subtaskId) {
         checkSupportCheckpointsAfterTasksFinished(closeIdleReaders);
         Properties props = new Properties();
-        props.setProperty("connector.class", OracleConnector.class.getCanonicalName());
+        props.setProperty("connector.class", getConnectorClass().getCanonicalName());
         // Logical name that identifies and provides a namespace for the particular Oracle
         // database server being
         // monitored. The logical name should be unique across all other connectors, since it is
@@ -137,5 +137,9 @@ public class OracleSourceConfigFactory extends JdbcSourceConfigFactory {
                 scanNewlyAddedTableEnabled,
                 assignUnboundedChunkFirst,
                 releaseSnapshotMetadataEnabled);
+    }
+
+    protected  Class<?> getConnectorClass() {
+        return OracleConnector.class;
     }
 }

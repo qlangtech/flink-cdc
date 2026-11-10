@@ -53,12 +53,14 @@ import org.apache.paimon.data.GenericRow;
 import org.apache.paimon.flink.FlinkCatalogFactory;
 import org.apache.paimon.index.BucketAssigner;
 import org.apache.paimon.index.HashBucketAssigner;
+import org.apache.paimon.index.IndexFileHandler;
 import org.apache.paimon.options.Options;
 import org.apache.paimon.table.BucketMode;
 import org.apache.paimon.table.FileStoreTable;
 import org.apache.paimon.table.sink.RowKeyExtractor;
 import org.apache.paimon.table.sink.RowPartitionKeyExtractor;
 import org.apache.paimon.utils.MathUtils;
+import org.apache.paimon.utils.SnapshotManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -342,7 +344,7 @@ public class BucketAssignOperator extends AbstractStreamOperatorAdapter<Event>
     }
 
     private Tuple4<BucketMode, RowKeyExtractor, BucketAssigner, RowPartitionKeyExtractor>
-            getTableInfo(TableId tableId) {
+    getTableInfo(TableId tableId) {
         Preconditions.checkNotNull(tableId, "Invalid tableId in given event.");
         FileStoreTable table;
         try {
@@ -357,6 +359,7 @@ public class BucketAssignOperator extends AbstractStreamOperatorAdapter<Event>
         return new Tuple4<>(
                 table.bucketMode(),
                 table.createRowKeyExtractor(),
+                // SnapshotManager snapshotManager, String commitUser, IndexFileHandler indexFileHandler, int numChannels, int numAssigners, int assignId, long targetBucketRowNumber, int maxBucketsNum
                 new HashBucketAssigner(
                         table.snapshotManager(),
                         commitUser,

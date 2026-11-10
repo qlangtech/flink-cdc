@@ -26,7 +26,7 @@ limitations under the License.
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>flink-cdc-pipeline-connector-kafka</artifactId>
+    <artifactId>flink-cdc-pipeline-connector-kafka-tis</artifactId>
 
     <properties>
         <version.kafka>3.4.0</version.kafka>

@@ -42,7 +42,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/** An Operator to add checkpointId to MultiTableCommittable and generate CommittableSummary. */
+/**
+ * An Operator to add checkpointId to MultiTableCommittable and generate CommittableSummary.
+ */
 public class PreCommitOperator
         extends AbstractStreamOperator<CommittableMessage<MultiTableCommittable>>
         implements OneInputStreamOperator<
@@ -59,13 +61,17 @@ public class PreCommitOperator
 
     private StoreMultiCommitter storeMultiCommitter;
 
-    /** store a list of MultiTableCommittable in one checkpoint. */
+    /**
+     * store a list of MultiTableCommittable in one checkpoint.
+     */
     private final List<MultiTableCommittable> multiTableCommittables;
 
     public PreCommitOperator(Options catalogOptions, String commitUser) {
         multiTableCommittables = new ArrayList<>();
         this.catalogOptions = catalogOptions;
         this.commitUser = commitUser;
+
+
     }
 
     @Override
@@ -78,9 +84,13 @@ public class PreCommitOperator
         super.initializeState(context);
         if (catalog == null) {
             this.catalog = FlinkCatalogFactory.createPaimonCatalog(catalogOptions);
+            // baisui add for paimon 1.1.1
+            int parallelism = RuntimeContextUtils.getNumberOfParallelSubtasks(getRuntimeContext());
+            int index = RuntimeContextUtils.getIndexOfThisSubtask(getRuntimeContext());
             this.storeMultiCommitter =
                     new StoreMultiCommitter(
                             () -> FlinkCatalogFactory.createPaimonCatalog(catalogOptions),
+                            // final String commitUser, @Nullable final OperatorMetricGroup metricGroup, final boolean streamingCheckpointEnabled, final boolean isRestored, final OperatorStateStore stateStore, final int parallelism, final int subtaskIndex
                             Committer.createContext(
                                     commitUser,
                                     getMetricGroup(),

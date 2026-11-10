@@ -1,0 +1,1 @@
+copy from [flink-connector-oracle-cdc](../flink-connector-oracle-cdc)

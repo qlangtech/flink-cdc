@@ -32,7 +32,7 @@ import org.apache.flink.cdc.connectors.mysql.source.events.BinlogSplitMetaAssemb
 import org.apache.flink.cdc.connectors.mysql.source.events.BinlogSplitMetaEvent;
 import org.apache.flink.cdc.connectors.mysql.source.events.FinishedSnapshotSplitsAckEvent;
 import org.apache.flink.cdc.connectors.mysql.source.events.LatestFinishedSplitsNumberRequestEvent;
-import org.apache.flink.cdc.connectors.mysql.source.metrics.MySqlSourceReaderMetrics;
+import org.apache.flink.cdc.connectors.base.source.metrics.SourceReaderMetrics;
 import org.apache.flink.cdc.connectors.mysql.source.offset.BinlogOffset;
 import org.apache.flink.cdc.connectors.mysql.source.split.FinishedSnapshotSplitInfo;
 import org.apache.flink.cdc.connectors.mysql.source.split.MySqlBinlogSplit;
@@ -694,12 +694,12 @@ class MySqlSourceReaderTest extends MySqlSourceTestBase {
                 limit > 0
                         ? new MysqlLimitedRecordEmitter(
                                 new ForwardDeserializeSchema(),
-                                new MySqlSourceReaderMetrics(readerContext.metricGroup()),
+                                new SourceReaderMetrics(readerContext.metricGroup()),
                                 configuration.isIncludeSchemaChanges(),
                                 limit)
                         : new MySqlRecordEmitter<>(
                                 new ForwardDeserializeSchema(),
-                                new MySqlSourceReaderMetrics(readerContext.metricGroup()),
+                                new SourceReaderMetrics(readerContext.metricGroup()),
                                 configuration.isIncludeSchemaChanges(),
                                 configuration.isIncludeHeartbeatEvents(),
                                 configuration.isIncludeTransactionMetadataEvents());
@@ -858,14 +858,14 @@ class MySqlSourceReaderTest extends MySqlSourceTestBase {
                 new FlinkJsonTableChangeSerializer();
 
         private final DebeziumDeserializationSchema<SourceRecord> debeziumDeserializationSchema;
-        private final MySqlSourceReaderMetrics sourceReaderMetrics;
+        private final SourceReaderMetrics sourceReaderMetrics;
         private final boolean includeSchemaChanges;
         private final OutputCollector<SourceRecord> outputCollector;
         private final int limit;
 
         public MysqlLimitedRecordEmitter(
                 DebeziumDeserializationSchema<SourceRecord> debeziumDeserializationSchema,
-                MySqlSourceReaderMetrics sourceReaderMetrics,
+                SourceReaderMetrics sourceReaderMetrics,
                 boolean includeSchemaChanges,
                 int limit) {
             super(

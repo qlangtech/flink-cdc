@@ -18,7 +18,7 @@
 package org.apache.flink.cdc.connectors.mysql.source.reader;
 
 import org.apache.flink.api.common.typeinfo.TypeInformation;
-import org.apache.flink.cdc.connectors.mysql.source.metrics.MySqlSourceReaderMetrics;
+import org.apache.flink.cdc.connectors.base.source.metrics.SourceReaderMetrics;
 import org.apache.flink.cdc.connectors.mysql.source.offset.BinlogOffset;
 import org.apache.flink.cdc.connectors.mysql.source.split.MySqlBinlogSplit;
 import org.apache.flink.cdc.connectors.mysql.source.split.MySqlBinlogSplitState;
@@ -107,8 +107,8 @@ class MySqlRecordEmitterTest {
                         return TypeInformation.of(Void.class);
                     }
                 },
-                new MySqlSourceReaderMetrics(
-                        UnregisteredMetricGroups.createUnregisteredOperatorMetricGroup()),
+                new SourceReaderMetrics(
+                        UnregisteredMetricGroups.createUnregisteredSourceReaderMetricGroup()),
                 false,
                 false,
                 false);
@@ -371,8 +371,8 @@ class MySqlRecordEmitterTest {
                         return TypeInformation.of(String.class);
                     }
                 },
-                new MySqlSourceReaderMetrics(
-                        UnregisteredMetricGroups.createUnregisteredOperatorMetricGroup()),
+                new SourceReaderMetrics(
+                        UnregisteredMetricGroups.createUnregisteredSourceReaderMetricGroup()),
                 false,
                 false,
                 includeTransactionMetadataEvents);

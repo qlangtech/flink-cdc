@@ -46,8 +46,10 @@ public class OracleConnectionUtils {
     /** Returned by column metadata in Oracle if no scale is set. */
     private static final int ORACLE_UNSET_SCALE = -127;
 
-    /** show current scn sql in oracle. */
-    private static final String SHOW_CURRENT_SCN = "SELECT CURRENT_SCN FROM V$DATABASE";
+    /** show current scn sql in oracle.
+     *  have move to
+     * */
+    //public static final String SHOW_CURRENT_SCN = "SELECT CURRENT_SCN FROM V$DATABASE";
 
     /** Creates a new {@link OracleSourceConnection}, but not open the connection. */
     public static OracleSourceConnection createOracleConnection(Configuration configuration) {
@@ -63,11 +65,11 @@ public class OracleConnectionUtils {
                 OracleConnectionUtils.class::getClassLoader);
     }
 
-    /** Fetch current redoLog offsets in Oracle Server. */
-    public static RedoLogOffset currentRedoLogOffset(JdbcConnection jdbc) {
+    /** Fetch current redoLog offsets in Oracle Server. OracleConnection.SHOW_CURRENT_SCN*/
+    public static RedoLogOffset currentRedoLogOffset(String queryCurrentRedoLogOffsetSQL,JdbcConnection jdbc) {
         try {
-            return jdbc.queryAndMap(
-                    SHOW_CURRENT_SCN,
+            return jdbc.queryAndMap(queryCurrentRedoLogOffsetSQL
+                    ,
                     rs -> {
                         if (rs.next()) {
                             final String scn = rs.getString(1);
@@ -75,14 +77,14 @@ public class OracleConnectionUtils {
                         } else {
                             throw new FlinkRuntimeException(
                                     "Cannot read the scn via '"
-                                            + SHOW_CURRENT_SCN
+                                            + queryCurrentRedoLogOffsetSQL
                                             + "'. Make sure your server is correctly configured");
                         }
                     });
         } catch (SQLException e) {
             throw new FlinkRuntimeException(
                     "Cannot read the redo log position via '"
-                            + SHOW_CURRENT_SCN
+                            + queryCurrentRedoLogOffsetSQL
                             + "'. Make sure your server is correctly configured",
                     e);
         }

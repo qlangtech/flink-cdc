@@ -28,6 +28,7 @@ import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.cdc.common.annotation.Internal;
 import org.apache.flink.cdc.common.annotation.PublicEvolving;
 import org.apache.flink.cdc.common.annotation.VisibleForTesting;
+import org.apache.flink.cdc.connectors.base.source.metrics.SourceReaderMetrics;
 import org.apache.flink.cdc.connectors.mysql.MySqlValidator;
 import org.apache.flink.cdc.connectors.mysql.debezium.DebeziumUtils;
 import org.apache.flink.cdc.connectors.mysql.source.assigners.MySqlBinlogSplitAssigner;
@@ -42,7 +43,6 @@ import org.apache.flink.cdc.connectors.mysql.source.assigners.state.SnapshotPend
 import org.apache.flink.cdc.connectors.mysql.source.config.MySqlSourceConfig;
 import org.apache.flink.cdc.connectors.mysql.source.config.MySqlSourceConfigFactory;
 import org.apache.flink.cdc.connectors.mysql.source.enumerator.MySqlSourceEnumerator;
-import org.apache.flink.cdc.connectors.mysql.source.metrics.MySqlSourceReaderMetrics;
 import org.apache.flink.cdc.connectors.mysql.source.reader.MySqlRecordEmitter;
 import org.apache.flink.cdc.connectors.mysql.source.reader.MySqlSourceReader;
 import org.apache.flink.cdc.connectors.mysql.source.reader.MySqlSourceReaderContext;
@@ -53,13 +53,11 @@ import org.apache.flink.cdc.connectors.mysql.source.utils.hooks.SnapshotPhaseHoo
 import org.apache.flink.cdc.debezium.DebeziumDeserializationSchema;
 import org.apache.flink.connector.base.source.reader.RecordEmitter;
 import org.apache.flink.core.io.SimpleVersionedSerializer;
-import org.apache.flink.metrics.MetricGroup;
 import org.apache.flink.util.FlinkRuntimeException;
 
 import io.debezium.jdbc.JdbcConnection;
 
 import java.io.Serializable;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.function.Supplier;
 
@@ -164,13 +162,8 @@ public class MySqlSource<T>
         MySqlSourceConfig sourceConfig =
                 configFactory.createConfig(readerContext.getIndexOfSubtask());
 
-        final Method metricGroupMethod = readerContext.getClass().getMethod("metricGroup");
-        metricGroupMethod.setAccessible(true);
-        final MetricGroup metricGroup = (MetricGroup) metricGroupMethod.invoke(readerContext);
-
-        final MySqlSourceReaderMetrics sourceReaderMetrics =
-                new MySqlSourceReaderMetrics(metricGroup);
-        sourceReaderMetrics.registerMetrics();
+        final SourceReaderMetrics sourceReaderMetrics =
+                new SourceReaderMetrics(readerContext.metricGroup());
         MySqlSourceReaderContext mySqlSourceReaderContext =
                 new MySqlSourceReaderContext(readerContext);
         Supplier<MySqlSplitReader> splitReaderSupplier =
@@ -296,6 +289,6 @@ public class MySqlSource<T>
     @FunctionalInterface
     interface RecordEmitterSupplier<T> extends Serializable {
 
-        MySqlRecordEmitter<T> get(MySqlSourceReaderMetrics metrics, MySqlSourceConfig sourceConfig);
+        MySqlRecordEmitter<T> get(SourceReaderMetrics metrics, MySqlSourceConfig sourceConfig);
     }
 }

@@ -59,7 +59,9 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
-/** Composer for translating data pipeline to a Flink DataStream job. */
+/**
+ * Composer for translating data pipeline to a Flink DataStream job.
+ */
 @Internal
 public class FlinkPipelineComposer implements PipelineComposer {
 
@@ -133,6 +135,37 @@ public class FlinkPipelineComposer implements PipelineComposer {
 
     private void translate(StreamExecutionEnvironment env, PipelineDef pipelineDef) {
         Configuration pipelineDefConfig = pipelineDef.getConfig();
+        String schemaOperatorUid =
+                pipelineDefConfig.get(PipelineOptions.PIPELINE_SCHEMA_OPERATOR_UID);
+        @Nullable
+        String operatorUidPrefix =
+                pipelineDefConfig.get(PipelineOptions.PIPELINE_OPERATOR_UID_PREFIX);
+        OperatorUidGenerator operatorUidGenerator = new OperatorUidGenerator(operatorUidPrefix);
+
+        if (operatorUidPrefix != null) {
+            schemaOperatorUid = operatorUidGenerator.generateUid(SCHEMA_OPERATOR_UID_SUFFIX);
+        }
+
+        DataSourceTranslator sourceTranslator = new DataSourceTranslator();
+        DataSource dataSource =
+                sourceTranslator.createDataSource(pipelineDef.getSource(), pipelineDefConfig, env);
+        int parallelism = pipelineDefConfig.get(PipelineOptions.PIPELINE_PARALLELISM);
+        DataStream<Event> stream =
+                sourceTranslator.translate(
+                        pipelineDef.getSource(),
+                        dataSource,
+                        env,
+                        parallelism,
+                        operatorUidGenerator);
+        DataSinkTranslator sinkTranslator = new DataSinkTranslator();
+        DataSink dataSink =
+                sinkTranslator.createDataSink(pipelineDef.getSink(), pipelineDefConfig, env);
+        translate(env, dataSource, dataSink, sinkTranslator, stream, pipelineDef);
+    }
+
+    public void translate(StreamExecutionEnvironment env, DataSource dataSource
+            , DataSink dataSink, DataSinkTranslator sinkTranslator, DataStream<Event> stream, PipelineDef pipelineDef) {
+        Configuration pipelineDefConfig = pipelineDef.getConfig();
         int parallelism = pipelineDefConfig.get(PipelineOptions.PIPELINE_PARALLELISM);
         SchemaChangeBehavior schemaChangeBehavior =
                 pipelineDefConfig.get(PipelineOptions.PIPELINE_SCHEMA_CHANGE_BEHAVIOR);
@@ -161,7 +194,6 @@ public class FlinkPipelineComposer implements PipelineComposer {
         }
 
         // Initialize translators
-        DataSourceTranslator sourceTranslator = new DataSourceTranslator();
         TransformTranslator transformTranslator = new TransformTranslator();
         PartitioningTranslator partitioningTranslator = new PartitioningTranslator();
         SchemaOperatorTranslator schemaOperatorTranslator =
@@ -171,14 +203,10 @@ public class FlinkPipelineComposer implements PipelineComposer {
                         schemaOperatorUid,
                         pipelineDefConfig.get(PipelineOptions.PIPELINE_SCHEMA_OPERATOR_RPC_TIMEOUT),
                         pipelineDefConfig.get(PipelineOptions.PIPELINE_LOCAL_TIME_ZONE));
-        DataSinkTranslator sinkTranslator = new DataSinkTranslator();
+
 
         // And required constructors
         OperatorIDGenerator schemaOperatorIDGenerator = new OperatorIDGenerator(schemaOperatorUid);
-        DataSource dataSource =
-                sourceTranslator.createDataSource(pipelineDef.getSource(), pipelineDefConfig, env);
-        DataSink dataSink =
-                sinkTranslator.createDataSink(pipelineDef.getSink(), pipelineDefConfig, env);
         HashFunctionProvider<DataChangeEvent> sinkDefinedHashFunctionProvider =
                 dataSink.getDataChangeEventHashFunctionProvider(parallelism);
         validatePartitioningStrategyCompatibility(pipelineDef, sinkDefinedHashFunctionProvider);
@@ -187,15 +215,6 @@ public class FlinkPipelineComposer implements PipelineComposer {
                 resolveHashFunctionProvider(pipelineDefConfig, sinkDefinedHashFunctionProvider);
 
         boolean isParallelMetadataSource = dataSource.isParallelMetadataSource();
-
-        // O ---> Source
-        DataStream<Event> stream =
-                sourceTranslator.translate(
-                        pipelineDef.getSource(),
-                        dataSource,
-                        env,
-                        parallelism,
-                        operatorUidGenerator);
 
         // Source ---> PreTransform
         stream =

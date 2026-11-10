@@ -241,14 +241,26 @@ public class BinlogOffset implements Comparable<BinlogOffset>, Serializable {
             }
         }
 
+        // fix for issue:https://github.com/datavane/tis/issues/477 flink-cdc启动如mysql 数据库的binlog没有开启 gtid功能 就会报异常
         // First compare the MySQL binlog filenames
-        if (this.getFilename() != null
-                && that.getFilename() != null
-                && this.getFilename().compareToIgnoreCase(that.getFilename()) != 0) {
-            if (this.getFilename().length() != that.getFilename().length()) {
-                return Integer.compare(this.getFilename().length(), that.getFilename().length());
+        // Handle null filenames gracefully (e.g., for LATEST/TIMESTAMP offsets)
+        String thisFilename = this.getFilename();
+        String thatFilename = that.getFilename();
+
+        // If both filenames are null, they're equal - continue to position comparison
+        if (thisFilename == null && thatFilename == null) {
+            // Fall through to position comparison below
+        } else if (thisFilename == null) {
+            // Offset without filename is considered earlier
+            return -1;
+        } else if (thatFilename == null) {
+            // Offset with filename is considered later
+            return 1;
+        } else if (thisFilename.compareToIgnoreCase(thatFilename) != 0) {
+            if (thisFilename.length() != thatFilename.length()) {
+                return Integer.compare(thisFilename.length(), thatFilename.length());
             }
-            return this.getFilename().compareToIgnoreCase(that.getFilename());
+            return thisFilename.compareToIgnoreCase(thatFilename);
         }
 
         // The filenames are the same, so compare the positions
