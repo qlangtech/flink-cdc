@@ -25,10 +25,10 @@ limitations under the License.
         <version>3.7.0</version>
     </parent>
 
-    <artifactId>flink-cdc-pipeline-connector-iceberg</artifactId>
+    <artifactId>flink-cdc-pipeline-connector-iceberg-tis</artifactId>
     <packaging>jar</packaging>
 
-    <name>flink-cdc-pipeline-connector-iceberg</name>
+    <name>flink-cdc-pipeline-connector-iceberg-tis</name>
 
     <dependencies>
         <dependency>

@@ -4,6 +4,8 @@ mvn clean deploy  -Dspotless.check.skip=true -Dmaven.test.skip=true -Ptis,docs-a
 -pl flink-cdc-connect/flink-cdc-source-connectors/flink-connector-kingbase-cdc\
 ,flink-cdc-connect/flink-cdc-source-connectors/flink-connector-oracle-cdc\
 ,flink-cdc-connect/flink-cdc-source-connectors/flink-connector-dameng-cdc\
+,flink-cdc-connect/flink-cdc-source-connectors/flink-cdc-pipeline-connector-iceberg\
+,flink-cdc-connect/flink-cdc-source-connectors/flink-cdc-pipeline-connector-hudi\
 ,flink-cdc-connect/flink-cdc-pipeline-connectors/flink-cdc-pipeline-connector-paimon\
 ,flink-cdc-connect/flink-cdc-pipeline-connectors/flink-cdc-pipeline-connector-kafka\
 ,flink-cdc-connect/flink-cdc-source-connectors/flink-connector-mysql-cdc\
